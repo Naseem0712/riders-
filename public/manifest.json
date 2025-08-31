@@ -9,6 +9,8 @@
   "theme_color": "#000000",
   "background_color": "#000000",
   "scope": "/",
+  "start_url": "/",
+  "id": "com.riders.luxury",
   "categories": ["travel", "lifestyle", "social"],
   "screenshots": [
     {
@@ -90,6 +92,13 @@
   ],
   "related_applications": [],
   "prefer_related_applications": false,
+  "dir": "ltr",
+  "iarc_rating_id": "",
+  "serviceworker": {
+    "src": "/sw.js",
+    "scope": "/",
+    "use_cache": true
+  },
   "edge_side_panel": {
     "preferred_width": 400
   },

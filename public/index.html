@@ -1322,5 +1322,20 @@
     <script src="/js/ui.js?v=v2"></script>
     <script src="/js/pwa.js?v=v2-fixed"></script>
     <script src="/js/app.js?v=v3-fixed"></script>
+    
+    <script>
+    // Register Service Worker for enhanced PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('🚗 Riders Luxury: Service Worker registered successfully');
+          })
+          .catch((error) => {
+            console.log('🚗 Riders Luxury: Service Worker registration failed:', error);
+          });
+      });
+    }
+    </script>
 </body>
 </html>
