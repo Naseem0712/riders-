@@ -736,7 +736,7 @@ const App = {
   async reverseGeocode(lat, lng) {
     // For demo purposes, return a sample address
     return `Near ${lat.toFixed(3)}, ${lng.toFixed(3)}`;
-  }
+  },
   
   // Switch bookings tab
   switchBookingsTab(tab) {
