@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Real PNG Icons</title>
+</head>
+<body>
+    <h1>Creating Real PNG Icons for Riders Luxury</h1>
+    <div id="status"></div>
+    
+    <script>
+        const sizes = [72, 96, 144, 192, 512];
+        const status = document.getElementById('status');
+        
+        function createPNGIcon(size) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                
+                // Black background with gradient
+                const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+                gradient.addColorStop(0, '#1a1a1a');
+                gradient.addColorStop(1, '#000000');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+                
+                // Gold border
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = Math.max(3, size * 0.015);
+                ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, size-ctx.lineWidth, size-ctx.lineWidth);
+                
+                // Car icon (simplified)
+                const carSize = size * 0.4;
+                const carX = size/2 - carSize/2;
+                const carY = size/2 - carSize/4;
+                
+                // Car body
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(carX, carY, carSize, carSize/2);
+                
+                // Car windows
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(carX + carSize*0.15, carY + carSize*0.05, carSize*0.7, carSize*0.2);
+                
+                // Car wheels
+                ctx.fillStyle = '#333333';
+                const wheelSize = carSize * 0.15;
+                ctx.beginPath();
+                ctx.arc(carX + carSize*0.2, carY + carSize*0.45, wheelSize, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(carX + carSize*0.8, carY + carSize*0.45, wheelSize, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // App name
+                ctx.fillStyle = '#FFD700';
+                ctx.font = `bold ${size * 0.06}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText('RIDERS', size/2, size - size*0.15);
+                ctx.font = `${size * 0.045}px Arial`;
+                ctx.fillText('LUXURY', size/2, size - size*0.08);
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `icon-${size}x${size}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    status.innerHTML += `<p>✅ Created icon-${size}x${size}.png</p>`;
+                    resolve();
+                }, 'image/png', 1.0);
+            });
+        }
+        
+        async function createAllIcons() {
+            status.innerHTML = '<p>🎨 Creating high-quality PNG icons...</p>';
+            
+            for (const size of sizes) {
+                await createPNGIcon(size);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            status.innerHTML += '<p><strong>🎉 All PNG icons created! Upload them to public/icons/ folder</strong></p>';
+            status.innerHTML += '<p><strong>📱 Then try PWA Builder again for perfect score!</strong></p>';
+        }
+        
+        // Start creating icons
+        createAllIcons();
+    </script>
+</body>
+</html>
