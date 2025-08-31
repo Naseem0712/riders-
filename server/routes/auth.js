@@ -521,9 +521,15 @@ router.post('/verify-otp', async (req, res) => {
     try {
       user = await User.findOne({ mobile: normalizedMobile });
     } catch (dbError) {
-      // Database not connected - create temporary user for demo
-      console.log('🔧 Database not connected, using temporary storage for demo');
-      user = null; // Always treat as new user when DB not available
+      // Database not connected - check local storage for existing user
+      console.log('🔧 Database not connected, checking local user storage');
+      // Try to find existing user in memory (for demo mode)
+      const existingUserId = global.tempUsers && global.tempUsers[normalizedMobile];
+      if (existingUserId) {
+        user = { _id: existingUserId, mobile: normalizedMobile, name: 'Existing User', mobileVerified: true };
+      } else {
+        user = null; // New user
+      }
     }
     
     if (user) {
@@ -603,6 +609,11 @@ router.post('/verify-otp', async (req, res) => {
         // Database not connected - create temporary user for demo
         console.log('🔧 Database registration failed, using demo mode');
         const demoUserId = 'demo_' + Date.now();
+        
+        // Store user in temporary memory for persistence
+        if (!global.tempUsers) global.tempUsers = {};
+        global.tempUsers[normalizedMobile] = demoUserId;
+        
         res.status(201).json({
           success: true,
           message: 'Registration successful via OTP (demo mode).',

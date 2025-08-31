@@ -518,8 +518,16 @@ const App = {
       return;
     }
     
-    // Implementation for offering rides
-    this.showToast('Ride offer functionality coming soon!', 'info');
+    // Check if user has vehicles
+    await Vehicle.loadUserVehicles();
+    if (Vehicle.userVehicles.length === 0) {
+      this.showToast('Please add a vehicle first to offer rides', 'warning');
+      this.showSection('profile');
+      return;
+    }
+    
+    // Show ride offer form
+    this.showSection('offer-ride');
   },
   
   // Book a ride
