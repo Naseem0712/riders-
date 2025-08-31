@@ -1,7 +1,7 @@
 // Service Worker for Riders Luxury PWA
 // Provides offline functionality, caching, and background sync
 
-const CACHE_NAME = 'riders-luxury-v1.0.0';
+const CACHE_NAME = 'riders-luxury-v2.0.0-fixed';
 const STATIC_CACHE = 'riders-static-v1.0.0';
 const DYNAMIC_CACHE = 'riders-dynamic-v1.0.0';
 

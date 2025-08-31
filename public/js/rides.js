@@ -13,12 +13,12 @@ const Rides = {
   
   // API endpoints
   endpoints: {
-    search: '/api/rides/search',
-    create: '/api/rides',
-    get: '/api/rides',
-    update: '/api/rides',
-    delete: '/api/rides',
-    myRides: '/api/rides/driver/my-rides'
+    search: '/rides/search',
+    create: '/rides',
+    get: '/rides',
+    update: '/rides',
+    delete: '/rides',
+    myRides: '/rides/driver/my-rides'
   },
   
   // Initialize rides module
@@ -26,6 +26,56 @@ const Rides = {
     this.initEventListeners();
     this.initGeolocation();
     console.log('🚗 Rides module initialized');
+  },
+  
+  // Load user vehicles for offer ride form
+  async loadUserVehicles() {
+    if (!Auth.isAuthenticated()) return;
+    
+    try {
+      const response = await Auth.apiRequest('/vehicles/my-vehicles');
+      const data = await response.json();
+      
+      if (data.success) {
+        this.populateVehicleSelect(data.data.vehicles);
+      }
+    } catch (error) {
+      console.error('Load vehicles error:', error);
+    }
+  },
+  
+  // Populate vehicle select dropdown
+  populateVehicleSelect(vehicles) {
+    const vehicleSelect = document.getElementById('vehicleSelect');
+    if (!vehicleSelect) return;
+    
+    if (vehicles.length === 0) {
+      vehicleSelect.innerHTML = `
+        <option value="">No vehicles found</option>
+        <option value="add-new">+ Add New Vehicle</option>
+      `;
+      return;
+    }
+    
+    vehicleSelect.innerHTML = `
+      <option value="">Select your vehicle</option>
+      ${vehicles.map(vehicle => `
+        <option value="${vehicle._id}">
+          ${vehicle.vehicleName || (vehicle.make + ' ' + vehicle.model)} 
+          (${vehicle.licensePlate})
+          ${vehicle.isVerified ? '✅' : '⏳'}
+        </option>
+      `).join('')}
+      <option value="add-new">+ Add New Vehicle</option>
+    `;
+    
+    // Handle add new vehicle selection
+    vehicleSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'add-new') {
+        App.showSection('vehicle');
+        e.target.value = ''; // Reset selection
+      }
+    });
   },
   
   // Initialize event listeners
@@ -93,6 +143,60 @@ const Rides = {
         this.addLocationAutocomplete(input);
       }
     });
+    
+    // Initialize bike options
+    this.initBikeOptions();
+  },
+  
+  // Initialize bike-specific options
+  initBikeOptions() {
+    // Search vehicle type change
+    const searchVehicleType = document.getElementById('searchVehicleType');
+    if (searchVehicleType) {
+      searchVehicleType.addEventListener('change', this.handleSearchVehicleTypeChange.bind(this));
+    }
+    
+    // Request vehicle type change
+    const requestVehicleType = document.getElementById('requestVehicleType');
+    if (requestVehicleType) {
+      requestVehicleType.addEventListener('change', this.handleRequestVehicleTypeChange.bind(this));
+    }
+    
+    // Helmet provided checkbox
+    const helmetProvided = document.getElementById('helmetProvided');
+    if (helmetProvided) {
+      helmetProvided.addEventListener('change', this.handleHelmetProvidedChange.bind(this));
+    }
+  },
+  
+  // Handle search vehicle type change
+  handleSearchVehicleTypeChange(e) {
+    const vehicleType = e.target.value;
+    const bikeOptions = document.getElementById('bikeOptions');
+    
+    if (bikeOptions) {
+      bikeOptions.style.display = vehicleType === 'bike' ? 'block' : 'none';
+    }
+  },
+  
+  // Handle request vehicle type change
+  handleRequestVehicleTypeChange(e) {
+    const vehicleType = e.target.value;
+    const requestBikeOptions = document.getElementById('requestBikeOptions');
+    
+    if (requestBikeOptions) {
+      requestBikeOptions.style.display = vehicleType === 'bike' ? 'block' : 'none';
+    }
+  },
+  
+  // Handle helmet provided change
+  handleHelmetProvidedChange(e) {
+    const isProvided = e.target.checked;
+    const helmetConditionGroup = document.getElementById('helmetConditionGroup');
+    
+    if (helmetConditionGroup) {
+      helmetConditionGroup.style.display = isProvided ? 'block' : 'none';
+    }
   },
   
   // Add location autocomplete to input
@@ -562,13 +666,21 @@ const Rides = {
   
   // Get selected vehicle
   getSelectedVehicle() {
-    // This would get the selected vehicle from the vehicle selector
-    // For now, return a mock vehicle ID
-    return 'mock-vehicle-id';
+    const vehicleSelect = document.getElementById('vehicleSelect');
+    if (!vehicleSelect || !vehicleSelect.value) {
+      App.showToast('Please select a vehicle first', 'error');
+      return null;
+    }
+    return vehicleSelect.value;
   },
   
   // Validate offer form
   validateOfferForm(formData) {
+    if (!formData.vehicleId) {
+      App.showToast('Please select a vehicle first', 'error');
+      return false;
+    }
+    
     if (!formData.pickup.address || !formData.destination.address) {
       App.showToast('Please fill in pickup and destination', 'error');
       return false;
@@ -921,7 +1033,7 @@ const Rides = {
     }
     
     try {
-      const response = await Auth.apiRequest('/api/ride-requests', {
+      const response = await Auth.apiRequest('/ride-requests', {
         method: 'POST',
         body: JSON.stringify(requestData)
       });

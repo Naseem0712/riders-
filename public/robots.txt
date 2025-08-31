@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /search
+Allow: /rides/*
+Allow: /js/*.js
+Allow: /css/*.css
+Allow: /icons/*
+
+Disallow: /api/
+Disallow: /admin/
+Disallow: /test.html
+
+# Sitemap location
+Sitemap: https://riderspool.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

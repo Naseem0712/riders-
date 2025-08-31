@@ -37,14 +37,14 @@ router.post('/', authenticate, requireDriver, async (req, res) => {
     const vehicle = await Vehicle.findOne({
       _id: vehicleId,
       owner: req.user._id,
-      isActive: true,
-      isVerified: true
+      isActive: true
+      // Temporarily removed: isVerified: true
     });
 
     if (!vehicle) {
       return res.status(404).json({
         success: false,
-        message: 'Vehicle not found or not verified.'
+        message: 'Vehicle not found. Please add a vehicle first.'
       });
     }
 

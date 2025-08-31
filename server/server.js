@@ -10,7 +10,10 @@ const authRoutes = require('./routes/auth');
 const rideRoutes = require('./routes/rides');
 const bookingRoutes = require('./routes/bookings');
 const userRoutes = require('./routes/users');
+const vehicleRoutes = require('./routes/vehicles');
 const rideRequestRoutes = require('./routes/rideRequests');
+const chatRoutes = require('./routes/chat');
+const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 
@@ -87,12 +90,21 @@ const connectDB = async () => {
 
 connectDB();
 
+// Import SEO routes
+const seoRoutes = require('./routes/seo');
+
+// SEO routes (before API routes for proper precedence)
+app.use('/', seoRoutes);
+
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/ride-requests', rideRequestRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Serve frontend for all non-API routes
 app.get('*', (req, res) => {

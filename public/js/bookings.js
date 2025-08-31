@@ -11,12 +11,12 @@ const Bookings = {
   
   // API endpoints
   endpoints: {
-    create: '/api/bookings',
-    myBookings: '/api/bookings/my-bookings',
-    get: '/api/bookings',
-    cancel: '/api/bookings/cancel',
-    shareLocation: '/api/bookings/share-location',
-    rate: '/api/bookings/rate'
+    create: '/bookings',
+    myBookings: '/bookings/my-bookings',
+    get: '/bookings',
+    cancel: '/bookings/cancel',
+    shareLocation: '/bookings/share-location',
+    rate: '/bookings/rate'
   },
   
   // Initialize bookings module

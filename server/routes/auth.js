@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const User = require('../models/User');
 const { generateToken, authenticate } = require('../middleware/auth');
+const otpService = require('../services/otpService');
+const emailService = require('../services/emailService');
 
 const router = express.Router();
 
@@ -441,6 +443,368 @@ router.post('/change-password', authenticate, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Internal server error during password change.'
+    });
+  }
+});
+
+// @route   POST /api/auth/send-otp
+// @desc    Send OTP to mobile number
+// @access  Public
+router.post('/send-otp', async (req, res) => {
+  try {
+    const { mobile } = req.body;
+
+    if (!mobile) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mobile number is required.'
+      });
+    }
+
+    // Send OTP
+    const result = await otpService.generateAndSendOTP(mobile);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: result.message,
+        data: {
+          mobile: result.mobile,
+          expiresIn: result.expiresIn
+        }
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message
+      });
+    }
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during OTP sending.'
+    });
+  }
+});
+
+// @route   POST /api/auth/verify-otp
+// @desc    Verify OTP and login/register user
+// @access  Public
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { mobile, otp, name, role = 'user' } = req.body;
+
+    if (!mobile || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mobile number and OTP are required.'
+      });
+    }
+
+    // Verify OTP
+    const otpResult = await otpService.verifyOTP(mobile, otp);
+    
+    if (!otpResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: otpResult.message,
+        attemptsRemaining: otpResult.attemptsRemaining
+      });
+    }
+
+    // Normalize mobile number
+    const normalizedMobile = otpService.normalizeMobile(mobile);
+    
+    // Check if user exists
+    let user = await User.findOne({ mobile: normalizedMobile });
+    
+    if (user) {
+      // Existing user - login
+      user.lastLogin = new Date();
+      user.mobileVerified = true;
+      await user.save();
+      
+      const token = generateToken(user._id);
+      
+      const userResponse = user.toObject();
+      delete userResponse.password;
+      
+      res.json({
+        success: true,
+        message: 'Login successful via OTP.',
+        data: {
+          user: userResponse,
+          token,
+          isNewUser: false
+        }
+      });
+    } else {
+      // New user - register
+      if (!name) {
+        return res.status(400).json({
+          success: false,
+          message: 'Name is required for new user registration.'
+        });
+      }
+      
+      // Create new user without password (OTP-based account)
+      user = new User({
+        name: name.trim(),
+        mobile: normalizedMobile,
+        mobileVerified: true,
+        role: ['user', 'driver'].includes(role) ? role : 'user',
+        authMethod: 'otp'
+      });
+      
+      await user.save();
+      
+      const token = generateToken(user._id);
+      
+      const userResponse = user.toObject();
+      delete userResponse.password;
+      
+      res.status(201).json({
+        success: true,
+        message: 'Registration successful via OTP.',
+        data: {
+          user: userResponse,
+          token,
+          isNewUser: true
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mobile number is already registered.'
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during OTP verification.'
+    });
+  }
+});
+
+// @route   POST /api/auth/send-verification-email
+// @desc    Send email verification link
+// @access  Public
+router.post('/send-verification-email', async (req, res) => {
+  try {
+    const { email, name, role = 'user' } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required.'
+      });
+    }
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name is required.'
+      });
+    }
+
+    // Validate email format
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.'
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      email: email.toLowerCase()
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'A user with this email already exists.'
+      });
+    }
+
+    // Create temporary user record (unverified)
+    const tempUser = new User({
+      name: name.trim(),
+      email: email.toLowerCase(),
+      role: ['user', 'driver'].includes(role) ? role : 'user',
+      emailVerified: false,
+      isActive: false, // Inactive until email verified
+      authMethod: 'email'
+    });
+    
+    await tempUser.save();
+
+    // Send verification email
+    const result = await emailService.generateAndSendVerificationEmail(email);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email,
+          verificationLink: result.verificationLink // Only in development
+        }
+      });
+    } else {
+      // Remove temp user if email failed
+      await User.findByIdAndDelete(tempUser._id);
+      
+      res.status(400).json({
+        success: false,
+        message: result.message
+      });
+    }
+  } catch (error) {
+    console.error('Send verification email error:', error);
+    
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'A user with this email already exists.'
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during email verification sending.'
+    });
+  }
+});
+
+// @route   POST /api/auth/verify-email
+// @desc    Verify email and set password
+// @access  Public
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { email, token, password } = req.body;
+
+    if (!email || !token || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, token, and password are required.'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long.'
+      });
+    }
+
+    // Verify email token
+    const tokenResult = await emailService.verifyToken(email, token, 'verification');
+    
+    if (!tokenResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: tokenResult.message
+      });
+    }
+
+    // Find and activate user
+    const user = await User.findOne({ 
+      email: email.toLowerCase(),
+      emailVerified: false 
+    });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found or already verified.'
+      });
+    }
+
+    // Update user
+    user.password = password;
+    user.emailVerified = true;
+    user.isActive = true;
+    await user.save();
+
+    // Generate login token
+    const loginToken = generateToken(user._id);
+    
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.json({
+      success: true,
+      message: 'Email verified and account activated successfully.',
+      data: {
+        user: userResponse,
+        token: loginToken
+      }
+    });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during email verification.'
+    });
+  }
+});
+
+// @route   POST /api/auth/resend-verification
+// @desc    Resend verification email
+// @access  Public
+router.post('/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required.'
+      });
+    }
+
+    // Find unverified user
+    const user = await User.findOne({ 
+      email: email.toLowerCase(),
+      emailVerified: false 
+    });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found or already verified.'
+      });
+    }
+
+    // Send verification email
+    const result = await emailService.generateAndSendVerificationEmail(email);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email,
+          verificationLink: result.verificationLink // Only in development
+        }
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message
+      });
+    }
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during resending verification.'
     });
   }
 });

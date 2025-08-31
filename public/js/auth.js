@@ -4,13 +4,13 @@
 const Auth = {
   // API endpoints
   endpoints: {
-    login: '/api/auth/login',
-    register: '/api/auth/register',
-    forgotPassword: '/api/auth/forgot-password',
-    resetPassword: '/api/auth/reset-password',
-    me: '/api/auth/me',
-    profile: '/api/auth/profile',
-    changePassword: '/api/auth/change-password'
+    login: '/auth/login',
+    register: '/auth/register',
+    forgotPassword: '/auth/forgot-password',
+    resetPassword: '/auth/reset-password',
+    me: '/auth/me',
+    profile: '/auth/profile',
+    changePassword: '/auth/change-password'
   },
   
   // Initialize authentication
@@ -37,6 +37,94 @@ const Auth = {
     const forgotForm = document.getElementById('forgotForm');
     if (forgotForm) {
       forgotForm.addEventListener('submit', this.handleForgotPassword.bind(this));
+    }
+    
+    // Method selectors
+    this.initMethodSelectors();
+    
+    // OTP and email verification buttons
+    this.initOTPButtons();
+    this.initEmailVerificationButtons();
+  },
+  
+  // Initialize method selectors
+  initMethodSelectors() {
+    // Login method selector
+    const loginMethodBtns = document.querySelectorAll('.login-method-selector .method-btn');
+    console.log('🔍 Found login method buttons:', loginMethodBtns.length);
+    loginMethodBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const method = e.currentTarget.dataset.method;
+        console.log('🔄 Switching login method to:', method);
+        this.switchLoginMethod(method);
+      });
+    });
+    
+    // Register method selector
+    const registerMethodBtns = document.querySelectorAll('.auth-method-selector .method-btn');
+    console.log('🔍 Found register method buttons:', registerMethodBtns.length);
+    registerMethodBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const method = e.currentTarget.dataset.method;
+        console.log('🔄 Switching register method to:', method);
+        this.switchRegisterMethod(method);
+      });
+    });
+    
+    // Set default methods if not already set
+    setTimeout(() => {
+      const defaultLoginMethod = document.querySelector('[data-method="password"]');
+      const defaultRegisterMethod = document.querySelector('[data-method="mobile"]');
+      
+      if (defaultLoginMethod) this.switchLoginMethod('password');
+      if (defaultRegisterMethod) this.switchRegisterMethod('mobile');
+    }, 50);
+  },
+  
+  // Initialize OTP buttons
+  initOTPButtons() {
+    console.log('🔍 Initializing OTP buttons...');
+    
+    // Register OTP
+    const sendOTPBtn = document.getElementById('sendOTPBtn');
+    console.log('📱 Send OTP button found:', !!sendOTPBtn);
+    if (sendOTPBtn) {
+      sendOTPBtn.addEventListener('click', this.handleSendOTP.bind(this));
+    }
+    
+    const verifyOTPBtn = document.getElementById('verifyOTPBtn');
+    if (verifyOTPBtn) {
+      verifyOTPBtn.addEventListener('click', this.handleVerifyOTP.bind(this));
+    }
+    
+    const resendOTPBtn = document.getElementById('resendOTPBtn');
+    if (resendOTPBtn) {
+      resendOTPBtn.addEventListener('click', this.handleResendOTP.bind(this));
+    }
+    
+    // Login OTP
+    const sendLoginOTPBtn = document.getElementById('sendLoginOTPBtn');
+    console.log('📱 Send Login OTP button found:', !!sendLoginOTPBtn);
+    if (sendLoginOTPBtn) {
+      sendLoginOTPBtn.addEventListener('click', this.handleSendLoginOTP.bind(this));
+    }
+    
+    const verifyLoginOTPBtn = document.getElementById('verifyLoginOTPBtn');
+    if (verifyLoginOTPBtn) {
+      verifyLoginOTPBtn.addEventListener('click', this.handleVerifyLoginOTP.bind(this));
+    }
+    
+    const resendLoginOTPBtn = document.getElementById('resendLoginOTPBtn');
+    if (resendLoginOTPBtn) {
+      resendLoginOTPBtn.addEventListener('click', this.handleResendLoginOTP.bind(this));
+    }
+  },
+  
+  // Initialize email verification buttons
+  initEmailVerificationButtons() {
+    const sendVerificationBtn = document.getElementById('sendVerificationBtn');
+    if (sendVerificationBtn) {
+      sendVerificationBtn.addEventListener('click', this.handleSendVerificationEmail.bind(this));
     }
   },
   
@@ -83,8 +171,9 @@ const Auth = {
       const data = await response.json();
       
       if (data.success) {
-        // Store token
+        // Store token and user data
         localStorage.setItem('riders_token', data.data.token);
+        localStorage.setItem('riders_user', JSON.stringify(data.data.user));
         
         // Update app state
         App.setAuthState(true, data.data.user);
@@ -172,8 +261,9 @@ const Auth = {
       const data = await response.json();
       
       if (data.success) {
-        // Store token
+        // Store token and user data
         localStorage.setItem('riders_token', data.data.token);
+        localStorage.setItem('riders_user', JSON.stringify(data.data.user));
         
         // Update app state
         App.setAuthState(true, data.data.user);
@@ -182,7 +272,7 @@ const Auth = {
         App.hideAuthModal();
         
         // Show success message
-        App.showToast(`Welcome to Riders Luxury, ${data.data.user.name}!`, 'success');
+        App.showToast(`Welcome to Riders Pool, ${data.data.user.name}!`, 'success');
         
         // Show appropriate section based on role
         if (data.data.user.role === 'driver') {
@@ -437,6 +527,7 @@ const Auth = {
   // Logout user
   logout() {
     localStorage.removeItem('riders_token');
+    localStorage.removeItem('riders_user');
     App.setAuthState(false, null);
     App.showSection('home');
     App.showToast('Logged out successfully', 'info');
@@ -503,6 +594,488 @@ const Auth = {
     } else {
       App.showToast('Biometric authentication not supported', 'error');
     }
+  },
+  
+  // Switch login method
+  switchLoginMethod(method) {
+    // Update active button
+    document.querySelectorAll('.login-method-selector .method-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`[data-method="${method}"]`).classList.add('active');
+    
+    // Show/hide method forms
+    document.querySelectorAll('.login-method').forEach(form => {
+      form.classList.remove('active');
+      form.style.display = 'none';
+    });
+    
+    const targetForm = method === 'password' ? 'passwordLogin' : 'otpLogin';
+    const form = document.getElementById(targetForm);
+    if (form) {
+      form.style.display = 'block';
+      form.classList.add('active');
+    }
+  },
+  
+  // Switch register method
+  switchRegisterMethod(method) {
+    // Update active button
+    document.querySelectorAll('.auth-method-selector .method-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`[data-method="${method}"]`).classList.add('active');
+    
+    // Show/hide method forms
+    document.querySelectorAll('.register-method').forEach(form => {
+      form.classList.remove('active');
+      form.style.display = 'none';
+    });
+    
+    const targetForm = method === 'mobile' ? 'mobileRegister' : 'emailRegister';
+    const form = document.getElementById(targetForm);
+    if (form) {
+      form.style.display = 'block';
+      form.classList.add('active');
+    }
+  },
+  
+  // Handle send OTP for registration
+  async handleSendOTP() {
+    const mobile = document.getElementById('registerMobileOTP').value;
+    const name = document.getElementById('registerNameMobile').value;
+    
+    if (!mobile || !name) {
+      App.showToast('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    const sendBtn = document.getElementById('sendOTPBtn');
+    const originalText = sendBtn.innerHTML;
+    
+    try {
+      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending...</span>';
+      sendBtn.disabled = true;
+      
+      const response = await fetch(App.apiUrl + '/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mobile })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        App.showToast(data.message, 'success');
+        
+        // Show OTP section
+        document.getElementById('otpSection').style.display = 'block';
+        document.getElementById('otpMobileDisplay').textContent = data.data.mobile;
+        
+        // Switch buttons
+        sendBtn.style.display = 'none';
+        document.getElementById('verifyOTPBtn').style.display = 'block';
+        document.getElementById('resendOTPBtn').style.display = 'block';
+        
+        // Focus OTP input
+        document.getElementById('otpInput').focus();
+        
+        // Start countdown
+        this.startOTPCountdown('resendOTPBtn', data.data.expiresIn || 300);
+        
+      } else {
+        App.showToast(data.message || 'Failed to send OTP', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      App.showToast('Failed to send OTP. Please check your connection.', 'error');
+    } finally {
+      sendBtn.innerHTML = originalText;
+      sendBtn.disabled = false;
+    }
+  },
+  
+  // Handle verify OTP for registration
+  async handleVerifyOTP() {
+    const mobile = document.getElementById('registerMobileOTP').value;
+    const otp = document.getElementById('otpInput').value;
+    const name = document.getElementById('registerNameMobile').value;
+    const role = document.getElementById('registerRoleMobile').value;
+    
+    if (!otp || otp.length !== 6) {
+      App.showToast('Please enter a valid 6-digit OTP', 'error');
+      return;
+    }
+    
+    const verifyBtn = document.getElementById('verifyOTPBtn');
+    const originalText = verifyBtn.innerHTML;
+    
+    try {
+      verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Verifying...</span>';
+      verifyBtn.disabled = true;
+      
+      const response = await fetch(App.apiUrl + '/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mobile, otp, name, role })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Store token and user data
+        localStorage.setItem('riders_token', data.data.token);
+        localStorage.setItem('riders_user', JSON.stringify(data.data.user));
+        
+        // Update app state
+        App.setAuthState(true, data.data.user);
+        
+        // Hide modal
+        App.hideAuthModal();
+        
+        // Show success message
+        const message = data.data.isNewUser 
+          ? `Welcome to Riders Pool, ${data.data.user.name}!`
+          : `Welcome back, ${data.data.user.name}!`;
+        App.showToast(message, 'success');
+        
+        // Redirect based on role
+        if (data.data.user.role === 'driver') {
+          App.showSection('offer');
+        } else {
+          App.showSection('search');
+        }
+        
+      } else {
+        App.showToast(data.message || 'OTP verification failed', 'error');
+        
+        if (data.attemptsRemaining !== undefined && data.attemptsRemaining === 0) {
+          // Reset form if no attempts remaining
+          this.resetOTPForm();
+        }
+      }
+      
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      App.showToast('OTP verification failed. Please try again.', 'error');
+    } finally {
+      verifyBtn.innerHTML = originalText;
+      verifyBtn.disabled = false;
+    }
+  },
+  
+  // Handle resend OTP
+  async handleResendOTP() {
+    const mobile = document.getElementById('registerMobileOTP').value;
+    
+    const resendBtn = document.getElementById('resendOTPBtn');
+    const originalText = resendBtn.innerHTML;
+    
+    try {
+      resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending...</span>';
+      resendBtn.disabled = true;
+      
+      const response = await fetch(App.apiUrl + '/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mobile })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        App.showToast('OTP resent successfully', 'success');
+        
+        // Clear previous OTP
+        document.getElementById('otpInput').value = '';
+        
+        // Start new countdown
+        this.startOTPCountdown('resendOTPBtn', data.data.expiresIn || 300);
+        
+      } else {
+        App.showToast(data.message || 'Failed to resend OTP', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      App.showToast('Failed to resend OTP. Please try again.', 'error');
+    } finally {
+      resendBtn.innerHTML = originalText;
+      resendBtn.disabled = false;
+    }
+  },
+  
+  // Handle send login OTP
+  async handleSendLoginOTP() {
+    const mobile = document.getElementById('loginMobileOTP').value;
+    
+    if (!mobile) {
+      App.showToast('Please enter your mobile number', 'error');
+      return;
+    }
+    
+    const sendBtn = document.getElementById('sendLoginOTPBtn');
+    const originalText = sendBtn.innerHTML;
+    
+    try {
+      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending...</span>';
+      sendBtn.disabled = true;
+      
+      const response = await fetch(App.apiUrl + '/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mobile })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        App.showToast(data.message, 'success');
+        
+        // Show OTP section
+        document.getElementById('loginOtpSection').style.display = 'block';
+        document.getElementById('loginOtpMobileDisplay').textContent = data.data.mobile;
+        
+        // Switch buttons
+        sendBtn.style.display = 'none';
+        document.getElementById('verifyLoginOTPBtn').style.display = 'block';
+        document.getElementById('resendLoginOTPBtn').style.display = 'block';
+        
+        // Focus OTP input
+        document.getElementById('loginOtpInput').focus();
+        
+        // Start countdown
+        this.startOTPCountdown('resendLoginOTPBtn', data.data.expiresIn || 300);
+        
+      } else {
+        App.showToast(data.message || 'Failed to send OTP', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Send login OTP error:', error);
+      App.showToast('Failed to send OTP. Please check your connection.', 'error');
+    } finally {
+      sendBtn.innerHTML = originalText;
+      sendBtn.disabled = false;
+    }
+  },
+  
+  // Handle verify login OTP
+  async handleVerifyLoginOTP() {
+    const mobile = document.getElementById('loginMobileOTP').value;
+    const otp = document.getElementById('loginOtpInput').value;
+    
+    if (!otp || otp.length !== 6) {
+      App.showToast('Please enter a valid 6-digit OTP', 'error');
+      return;
+    }
+    
+    const verifyBtn = document.getElementById('verifyLoginOTPBtn');
+    const originalText = verifyBtn.innerHTML;
+    
+    try {
+      verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Verifying...</span>';
+      verifyBtn.disabled = true;
+      
+      const response = await fetch(App.apiUrl + '/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mobile, otp })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Store token and user data
+        localStorage.setItem('riders_token', data.data.token);
+        localStorage.setItem('riders_user', JSON.stringify(data.data.user));
+        
+        // Update app state
+        App.setAuthState(true, data.data.user);
+        
+        // Hide modal
+        App.hideAuthModal();
+        
+        // Show success message
+        const message = data.data.isNewUser 
+          ? `Welcome to Riders Pool, ${data.data.user.name}!`
+          : `Welcome back, ${data.data.user.name}!`;
+        App.showToast(message, 'success');
+        
+        // Redirect to appropriate section
+        if (App.state.currentSection === 'home') {
+          App.showSection('search');
+        }
+        
+      } else {
+        App.showToast(data.message || 'OTP verification failed', 'error');
+        
+        if (data.attemptsRemaining !== undefined && data.attemptsRemaining === 0) {
+          // Reset form if no attempts remaining
+          this.resetLoginOTPForm();
+        }
+      }
+      
+    } catch (error) {
+      console.error('Verify login OTP error:', error);
+      App.showToast('OTP verification failed. Please try again.', 'error');
+    } finally {
+      verifyBtn.innerHTML = originalText;
+      verifyBtn.disabled = false;
+    }
+  },
+  
+  // Handle resend login OTP
+  async handleResendLoginOTP() {
+    const mobile = document.getElementById('loginMobileOTP').value;
+    
+    const resendBtn = document.getElementById('resendLoginOTPBtn');
+    const originalText = resendBtn.innerHTML;
+    
+    try {
+      resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending...</span>';
+      resendBtn.disabled = true;
+      
+      const response = await fetch(App.apiUrl + '/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mobile })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        App.showToast('OTP resent successfully', 'success');
+        
+        // Clear previous OTP
+        document.getElementById('loginOtpInput').value = '';
+        
+        // Start new countdown
+        this.startOTPCountdown('resendLoginOTPBtn', data.data.expiresIn || 300);
+        
+      } else {
+        App.showToast(data.message || 'Failed to resend OTP', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Resend login OTP error:', error);
+      App.showToast('Failed to resend OTP. Please try again.', 'error');
+    } finally {
+      resendBtn.innerHTML = originalText;
+      resendBtn.disabled = false;
+    }
+  },
+  
+  // Handle send verification email
+  async handleSendVerificationEmail() {
+    const email = document.getElementById('registerEmailVerify').value;
+    const name = document.getElementById('registerNameEmail').value;
+    const role = document.getElementById('registerRoleEmail').value;
+    
+    if (!email || !name) {
+      App.showToast('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    if (!this.isValidEmail(email)) {
+      App.showToast('Please enter a valid email address', 'error');
+      return;
+    }
+    
+    const sendBtn = document.getElementById('sendVerificationBtn');
+    const originalText = sendBtn.innerHTML;
+    
+    try {
+      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending...</span>';
+      sendBtn.disabled = true;
+      
+      const fullUrl = App.apiUrl + '/auth/send-verification-email';
+      console.log('🔗 Calling URL:', fullUrl);
+      const response = await fetch(fullUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, name, role })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        App.showToast(data.message, 'success');
+        
+        // Show success message
+        document.getElementById('emailSentMessage').style.display = 'block';
+        sendBtn.style.display = 'none';
+        
+        // In development, show verification link
+        if (data.data.verificationLink) {
+          console.log('🔗 Verification link:', data.data.verificationLink);
+          App.showToast('Check console for verification link (dev mode)', 'info');
+        }
+        
+      } else {
+        App.showToast(data.message || 'Failed to send verification email', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Send verification email error:', error);
+      App.showToast('Failed to send verification email. Please try again.', 'error');
+    } finally {
+      sendBtn.innerHTML = originalText;
+      sendBtn.disabled = false;
+    }
+  },
+  
+  // Start OTP countdown
+  startOTPCountdown(buttonId, seconds) {
+    const button = document.getElementById(buttonId);
+    let timeLeft = seconds;
+    
+    const updateButton = () => {
+      if (timeLeft > 0) {
+        button.innerHTML = `<i class="fas fa-clock"></i> <span>Resend in ${timeLeft}s</span>`;
+        button.disabled = true;
+        timeLeft--;
+        setTimeout(updateButton, 1000);
+      } else {
+        button.innerHTML = '<i class="fas fa-redo"></i> <span>Resend OTP</span>';
+        button.disabled = false;
+      }
+    };
+    
+    updateButton();
+  },
+  
+  // Reset OTP form
+  resetOTPForm() {
+    document.getElementById('otpSection').style.display = 'none';
+    document.getElementById('otpInput').value = '';
+    document.getElementById('sendOTPBtn').style.display = 'block';
+    document.getElementById('verifyOTPBtn').style.display = 'none';
+    document.getElementById('resendOTPBtn').style.display = 'none';
+  },
+  
+  // Reset login OTP form
+  resetLoginOTPForm() {
+    document.getElementById('loginOtpSection').style.display = 'none';
+    document.getElementById('loginOtpInput').value = '';
+    document.getElementById('sendLoginOTPBtn').style.display = 'block';
+    document.getElementById('verifyLoginOTPBtn').style.display = 'none';
+    document.getElementById('resendLoginOTPBtn').style.display = 'none';
   }
 };
 
@@ -587,8 +1160,12 @@ const FormValidation = {
 
 // Initialize authentication when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  Auth.init();
-  FormValidation.addRealTimeValidation();
+  // Wait a bit for all elements to be ready
+  setTimeout(() => {
+    Auth.init();
+    FormValidation.addRealTimeValidation();
+    console.log('🔐 Auth system ready');
+  }, 100);
 });
 
 // Export for global access

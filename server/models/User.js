@@ -12,25 +12,38 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: function() {
+      return this.authMethod === 'email' && this.emailVerified;
+    },
     unique: true,
+    sparse: true, // Allow multiple null values
     lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email']
+    validate: {
+      validator: function(v) {
+        return !v || validator.isEmail(v);
+      },
+      message: 'Please provide a valid email'
+    }
   },
   mobile: {
     type: String,
-    required: [true, 'Mobile number is required'],
+    required: function() {
+      return this.authMethod === 'mobile' && this.mobileVerified;
+    },
     unique: true,
+    sparse: true, // Allow multiple null values
     validate: {
       validator: function(v) {
-        return /^\+?[\d\s-()]{10,15}$/.test(v);
+        return !v || /^\+?[\d\s-()]{10,15}$/.test(v);
       },
       message: 'Please provide a valid mobile number'
     }
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: function() {
+      return this.authMethod === 'email' && this.emailVerified;
+    },
     minlength: [6, 'Password must be at least 6 characters'],
     select: false // Don't include password in queries by default
   },

@@ -42,7 +42,27 @@ const vehicleSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Number of seats is required'],
     min: [1, 'Vehicle must have at least 1 seat'],
-    max: [8, 'Vehicle cannot have more than 8 seats']
+    max: [50, 'Vehicle cannot have more than 50 seats']
+  },
+  seatingCapacity: {
+    type: Number,
+    required: [true, 'Seating capacity is required'],
+    min: [1, 'Vehicle must have at least 1 seat'],
+    max: [50, 'Vehicle cannot have more than 50 seats']
+  },
+  vehicleName: {
+    type: String,
+    trim: true,
+    maxlength: [50, 'Vehicle name cannot exceed 50 characters']
+  },
+  category: {
+    type: String,
+    enum: ['economy', 'comfort', 'luxury', 'business'],
+    default: 'comfort'
+  },
+  description: {
+    type: String,
+    maxlength: [500, 'Description cannot exceed 500 characters']
   },
   fuelType: {
     type: String,
@@ -51,8 +71,24 @@ const vehicleSchema = new mongoose.Schema({
   },
   vehicleType: {
     type: String,
-    enum: ['sedan', 'suv', 'hatchback', 'luxury', 'van', 'other'],
-    default: 'sedan'
+    enum: ['bike', 'car', 'auto', 'bus', 'sedan', 'suv', 'hatchback', 'luxury', 'van', 'other'],
+    required: true
+  },
+  
+  // Bike-specific fields
+  bikeDetails: {
+    hasExtraHelmet: { type: Boolean, default: false },
+    helmetCondition: { 
+      type: String, 
+      enum: ['new', 'good', 'average'], 
+      default: 'good' 
+    },
+    engineCapacity: Number, // in CC
+    bikeType: {
+      type: String,
+      enum: ['sports', 'cruiser', 'commuter', 'scooter', 'electric'],
+      default: 'commuter'
+    }
   },
   isVerified: {
     type: Boolean,

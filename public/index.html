@@ -3,15 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Riders Luxury - Premium ride sharing experience with elegant glassmorphism design">
-    <meta name="keywords" content="ride sharing, luxury rides, car pooling, travel, transportation">
-    <meta name="author" content="Riders Luxury">
+    <meta name="description" content="Riders Pool - Premium bike and car sharing platform. Find and share rides across India. Safe, affordable, and eco-friendly transportation with verified drivers.">
+    <meta name="keywords" content="riders pool, ride sharing india, car pooling, bike sharing, carpool delhi mumbai bangalore, share ride, travel india, affordable transport, verified drivers, bike ride share, car share india">
+    <meta name="author" content="Riders Pool">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://riderspool.com/">
+    <meta property="og:title" content="Riders Pool - Premium Bike & Car Sharing Platform">
+    <meta property="og:description" content="Find and share rides across India. Safe, affordable, and eco-friendly transportation with verified drivers. Join thousands of happy riders!">
+    <meta property="og:image" content="https://riderspool.com/icons/og-image.png">
+    <meta property="og:site_name" content="Riders Pool">
+    <meta property="og:locale" content="en_IN">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://riderspool.com/">
+    <meta property="twitter:title" content="Riders Pool - Premium Bike & Car Sharing Platform">
+    <meta property="twitter:description" content="Find and share rides across India. Safe, affordable, and eco-friendly transportation with verified drivers.">
+    <meta property="twitter:image" content="https://riderspool.com/icons/og-image.png">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="rating" content="General">
+    <meta name="revisit-after" content="1 days">
+    <meta name="distribution" content="global">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="IN">
+    <meta name="geo.country" content="India">
+    <meta name="geo.placename" content="India">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://riderspool.com/">
+    
+    <!-- Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Riders Pool",
+      "description": "Premium bike and car sharing platform for India",
+      "url": "https://riderspool.com",
+      "applicationCategory": "TravelApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "category": "Transportation",
+        "priceRange": "₹₹"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Riders Pool"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250"
+      }
+    }
+    </script>
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Riders Luxury">
+    <meta name="apple-mobile-web-app-title" content="Riders Pool">
     <meta name="msapplication-TileColor" content="#000000">
     
     <!-- Icons -->
@@ -33,7 +90,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <title>Riders Luxury - Premium Ride Sharing</title>
+    <title>Riders Pool - Premium Bike & Car Sharing</title>
     
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="/css/style.css">
@@ -77,6 +134,29 @@
             animation: pulse 2s infinite;
         }
         
+        .logo-icons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .bike-icon {
+            color: #4ade80;
+            animation: bounce 1.5s infinite;
+        }
+        
+        .car-icon {
+            color: #60a5fa;
+            animation: bounce 1.5s infinite 0.3s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
         @keyframes pulse {
             0%, 100% { opacity: 0.7; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.05); }
@@ -87,9 +167,12 @@
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-logo">
-            <i class="fas fa-car-side"></i>
-            <div style="margin-top: 10px;">Riders</div>
-            <div style="font-size: 1rem; font-weight: 400; opacity: 0.8;">Luxury</div>
+            <div class="logo-icons">
+                <i class="fas fa-motorcycle bike-icon"></i>
+                <i class="fas fa-car car-icon"></i>
+            </div>
+            <div style="margin-top: 10px; font-family: 'Playfair Display', serif; font-weight: 700;">Riders</div>
+            <div style="font-size: 1.2rem; font-weight: 600; opacity: 0.9; color: #60a5fa;">Pool</div>
         </div>
     </div>
 
@@ -97,8 +180,9 @@
     <nav id="navbar" class="navbar glass-card">
         <div class="nav-container">
             <div class="nav-brand">
-                <i class="fas fa-car-side"></i>
-                <span>Riders</span>
+                <i class="fas fa-motorcycle" style="color: #4ade80;"></i>
+                <i class="fas fa-car" style="color: #60a5fa; margin-left: -5px;"></i>
+                <span style="margin-left: 8px; font-family: 'Playfair Display', serif;">Riders <span style="color: #60a5fa;">Pool</span></span>
             </div>
             
             <div class="nav-menu" id="navMenu">
@@ -171,12 +255,12 @@
             <div class="hero">
                 <div class="hero-content">
                     <h1 class="hero-title">
-                        Luxury Ride Sharing
-                        <span class="gradient-text">Redefined</span>
+                        Premium Bike & Car Sharing
+                        <span class="gradient-text">Experience</span>
                     </h1>
                     <p class="hero-subtitle">
-                        Experience premium transportation with our elegant glass design interface. 
-                        Share rides in luxury vehicles with verified drivers.
+                        Choose between bikes and cars for your perfect ride. 
+                        Share journeys with verified drivers across India and beyond.
                     </p>
                     
                     <div class="hero-actions">
@@ -295,29 +379,17 @@
                     <form id="searchRideForm">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="searchPickup">
-                                    <i class="fas fa-circle pickup-dot"></i>
-                                    Pickup Location
+                                <label for="searchVehicleType">
+                                    <i class="fas fa-car"></i>
+                                    Vehicle Type
                                 </label>
-                                <input type="text" id="searchPickup" placeholder="Where are you leaving from?" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="searchDestination">
-                                    <i class="fas fa-map-marker-alt destination-dot"></i>
-                                    Destination
-                                </label>
-                                <input type="text" id="searchDestination" placeholder="Where are you going?" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="searchDate">
-                                    <i class="fas fa-calendar"></i>
-                                    Date
-                                </label>
-                                <input type="date" id="searchDate" required>
+                                <select id="searchVehicleType" required>
+                                    <option value="">Select Vehicle</option>
+                                    <option value="bike">🏍️ Bike</option>
+                                    <option value="car">🚗 Car</option>
+                                    <option value="auto">🛺 Auto Rickshaw</option>
+                                    <option value="bus">🚌 Bus</option>
+                                </select>
                             </div>
                             
                             <div class="form-group">
@@ -331,6 +403,58 @@
                                     <option value="3">3 passengers</option>
                                     <option value="4">4 passengers</option>
                                 </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Bike-specific options -->
+                        <div id="bikeOptions" class="bike-options" style="display: none;">
+                            <div class="form-group">
+                                <label for="helmetRequired">
+                                    <i class="fas fa-hard-hat"></i>
+                                    Helmet Requirement
+                                </label>
+                                <select id="helmetRequired">
+                                    <option value="">Any</option>
+                                    <option value="provided">🪖 Driver provides helmet</option>
+                                    <option value="own">🪖 I have my own helmet</option>
+                                    <option value="either">Either option</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="searchPickup">
+                                    <i class="fas fa-circle pickup-dot"></i>
+                                    Pickup Location
+                                </label>
+                                <input type="text" id="searchPickup" placeholder="Enter city, area, or landmark" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="searchDestination">
+                                    <i class="fas fa-map-marker-alt destination-dot"></i>
+                                    Destination
+                                </label>
+                                <input type="text" id="searchDestination" placeholder="Enter city, area, or landmark" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="searchDate">
+                                    <i class="fas fa-calendar"></i>
+                                    Date
+                                </label>
+                                <input type="date" id="searchDate" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="searchTime">
+                                    <i class="fas fa-clock"></i>
+                                    Time (Optional)
+                                </label>
+                                <input type="time" id="searchTime">
                             </div>
                         </div>
                         
@@ -427,6 +551,18 @@
                     <option value="2">2 passengers</option>
                     <option value="3">3 passengers</option>
                     <option value="4">4+ passengers</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Bike helmet option for ride request -->
+              <div id="requestBikeOptions" class="bike-options" style="display: none;">
+                <div class="form-group">
+                  <label>Helmet Option</label>
+                  <select id="requestHelmetOption">
+                    <option value="provided">Need helmet from driver</option>
+                    <option value="own">I have my own helmet</option>
+                    <option value="either">Either option works</option>
                   </select>
                 </div>
               </div>
@@ -677,7 +813,7 @@
     <div id="authModal" class="modal">
         <div class="modal-content glass-card">
             <div class="modal-header">
-                <h2 id="authModalTitle">Welcome to Riders Luxury</h2>
+                <h2 id="authModalTitle">Welcome to Riders Pool</h2>
                 <button class="modal-close" onclick="hideAuthModal()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -686,26 +822,80 @@
             <div class="modal-body">
                 <!-- Login Form -->
                 <form id="loginForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="loginEmail">
-                            <i class="fas fa-envelope"></i>
-                            Email or Mobile
-                        </label>
-                        <input type="text" id="loginEmail" placeholder="Enter your email or mobile number" required>
+                    <div class="login-method-selector" style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px; text-align: center; color: var(--primary-white);">Login Method</h4>
+                        <div class="method-buttons">
+                            <button type="button" class="btn btn-secondary method-btn active" data-method="password">
+                                <i class="fas fa-lock"></i>
+                                <span>Password</span>
+                            </button>
+                            <button type="button" class="btn btn-secondary method-btn" data-method="otp">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Mobile OTP</span>
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="loginPassword">
-                            <i class="fas fa-lock"></i>
-                            Password
-                        </label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    <!-- Password Login -->
+                    <div id="passwordLogin" class="login-method active">
+                        <div class="form-group">
+                            <label for="loginEmail">
+                                <i class="fas fa-envelope"></i>
+                                Email or Mobile
+                            </label>
+                            <input type="text" id="loginEmail" placeholder="Enter your email or mobile number" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">
+                                <i class="fas fa-lock"></i>
+                                Password
+                            </label>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary ripple-effect">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Login</span>
+                        </button>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary ripple-effect">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>Login</span>
-                    </button>
+                    <!-- OTP Login -->
+                    <div id="otpLogin" class="login-method" style="display: none;">
+                        <div class="form-group">
+                            <label for="loginMobileOTP">
+                                <i class="fas fa-phone"></i>
+                                Mobile Number
+                            </label>
+                            <input type="tel" id="loginMobileOTP" placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+                        
+                        <div id="loginOtpSection" style="display: none;">
+                            <div class="form-group">
+                                <label for="loginOtpInput">
+                                    <i class="fas fa-key"></i>
+                                    Enter OTP
+                                </label>
+                                <input type="text" id="loginOtpInput" placeholder="6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+                                <small style="color: var(--tertiary-white); margin-top: 5px; display: block;">OTP sent to <span id="loginOtpMobileDisplay"></span></small>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="sendLoginOTPBtn" class="btn btn-primary ripple-effect">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send OTP</span>
+                        </button>
+                        
+                        <button type="button" id="verifyLoginOTPBtn" class="btn btn-primary ripple-effect" style="display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Verify & Login</span>
+                        </button>
+                        
+                        <button type="button" id="resendLoginOTPBtn" class="btn btn-ghost" style="display: none; margin-top: 10px;">
+                            <i class="fas fa-redo"></i>
+                            <span>Resend OTP</span>
+                        </button>
+                    </div>
                     
                     <div class="auth-links">
                         <a href="#" onclick="showAuthModal('forgot')">Forgot Password?</a>
@@ -715,53 +905,115 @@
                 
                 <!-- Register Form -->
                 <form id="registerForm" class="auth-form" style="display: none;">
-                    <div class="form-group">
-                        <label for="registerName">
-                            <i class="fas fa-user"></i>
-                            Full Name
-                        </label>
-                        <input type="text" id="registerName" placeholder="Enter your full name" required>
+                    <div class="auth-method-selector" style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px; text-align: center; color: var(--primary-white);">Choose Registration Method</h4>
+                        <div class="method-buttons">
+                            <button type="button" class="btn btn-secondary method-btn active" data-method="mobile">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Mobile + OTP</span>
+                            </button>
+                            <button type="button" class="btn btn-secondary method-btn" data-method="email">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email Verification</span>
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="registerEmail">
-                            <i class="fas fa-envelope"></i>
-                            Email Address
-                        </label>
-                        <input type="email" id="registerEmail" placeholder="Enter your email address" required>
+                    <!-- Mobile Registration -->
+                    <div id="mobileRegister" class="register-method active">
+                        <div class="form-group">
+                            <label for="registerNameMobile">
+                                <i class="fas fa-user"></i>
+                                Full Name
+                            </label>
+                            <input type="text" id="registerNameMobile" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerMobileOTP">
+                                <i class="fas fa-phone"></i>
+                                Mobile Number
+                            </label>
+                            <input type="tel" id="registerMobileOTP" placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerRoleMobile">
+                                <i class="fas fa-user-tag"></i>
+                                I want to
+                            </label>
+                            <select id="registerRoleMobile" required>
+                                <option value="user">🚗 Find rides as a passenger</option>
+                                <option value="driver">🏍️ Offer rides as a driver</option>
+                            </select>
+                        </div>
+                        
+                        <div id="otpSection" style="display: none;">
+                            <div class="form-group">
+                                <label for="otpInput">
+                                    <i class="fas fa-key"></i>
+                                    Enter OTP
+                                </label>
+                                <input type="text" id="otpInput" placeholder="6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+                                <small style="color: var(--tertiary-white); margin-top: 5px; display: block;">OTP sent to <span id="otpMobileDisplay"></span></small>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="sendOTPBtn" class="btn btn-primary ripple-effect">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send OTP</span>
+                        </button>
+                        
+                        <button type="button" id="verifyOTPBtn" class="btn btn-primary ripple-effect" style="display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Verify & Register</span>
+                        </button>
+                        
+                        <button type="button" id="resendOTPBtn" class="btn btn-ghost" style="display: none; margin-top: 10px;">
+                            <i class="fas fa-redo"></i>
+                            <span>Resend OTP</span>
+                        </button>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="registerMobile">
-                            <i class="fas fa-phone"></i>
-                            Mobile Number
-                        </label>
-                        <input type="tel" id="registerMobile" placeholder="Enter your mobile number" required>
+                    <!-- Email Registration -->
+                    <div id="emailRegister" class="register-method" style="display: none;">
+                        <div class="form-group">
+                            <label for="registerNameEmail">
+                                <i class="fas fa-user"></i>
+                                Full Name
+                            </label>
+                            <input type="text" id="registerNameEmail" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerEmailVerify">
+                                <i class="fas fa-envelope"></i>
+                                Email Address
+                            </label>
+                            <input type="email" id="registerEmailVerify" placeholder="Enter your email address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerRoleEmail">
+                                <i class="fas fa-user-tag"></i>
+                                I want to
+                            </label>
+                            <select id="registerRoleEmail" required>
+                                <option value="user">🚗 Find rides as a passenger</option>
+                                <option value="driver">🏍️ Offer rides as a driver</option>
+                            </select>
+                        </div>
+                        
+                        <button type="button" id="sendVerificationBtn" class="btn btn-primary ripple-effect">
+                            <i class="fas fa-envelope-open"></i>
+                            <span>Send Verification Email</span>
+                        </button>
+                        
+                        <div id="emailSentMessage" style="display: none; text-align: center; margin-top: 15px; padding: 15px; background: rgba(34, 197, 94, 0.2); border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3);">
+                            <i class="fas fa-check-circle" style="color: #22c55e; margin-right: 8px;"></i>
+                            <span style="color: var(--primary-white);">Verification email sent! Please check your inbox and click the link to complete registration.</span>
+                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="registerPassword">
-                            <i class="fas fa-lock"></i>
-                            Password
-                        </label>
-                        <input type="password" id="registerPassword" placeholder="Create a strong password" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerRole">
-                            <i class="fas fa-user-tag"></i>
-                            I want to
-                        </label>
-                        <select id="registerRole" required>
-                                                <option value="user">🚗 Find rides as a passenger</option>
-                    <option value="driver">🏎️ Offer rides as a driver</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary ripple-effect">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Create Account</span>
-                    </button>
                     
                     <div class="auth-links">
                         <a href="#" onclick="showAuthModal('login')">Already have an account?</a>
@@ -801,7 +1053,7 @@
                 <i class="fas fa-mobile-alt"></i>
             </div>
             <div class="install-text">
-                <h3>Install Riders Luxury</h3>
+                <h3>Install Riders Pool</h3>
                 <p>Add to your home screen for quick access</p>
             </div>
             <div class="install-actions">
@@ -812,11 +1064,15 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/js/auth.js"></script>
-    <script src="/js/rides.js"></script>
-    <script src="/js/bookings.js"></script>
-    <script src="/js/ui.js"></script>
-    <script src="/js/pwa.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="/js/auth.js?v=v3-fixed"></script>
+    <script src="/js/rides.js?v=v3-fixed"></script>
+    <script src="/js/bookings.js?v=v2-fixed"></script>
+    <script src="/js/profile.js?v=v3-new"></script>
+    <script src="/js/vehicle.js?v=v3-new"></script>
+    <script src="/js/chat.js?v=v3-new"></script>
+    <script src="/js/notifications.js?v=v3-new"></script>
+    <script src="/js/ui.js?v=v2"></script>
+    <script src="/js/pwa.js?v=v2-fixed"></script>
+    <script src="/js/app.js?v=v3-fixed"></script>
 </body>
 </html>

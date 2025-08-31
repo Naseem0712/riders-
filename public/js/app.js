@@ -195,7 +195,9 @@ const App = {
         
       case 'offer':
         if (this.state.isAuthenticated) {
-          await this.loadUserVehicles();
+          await Rides.loadUserVehicles();
+        } else {
+          this.showAuthModal('login');
         }
         break;
         

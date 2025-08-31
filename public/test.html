@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riders Pool - API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        button {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        input {
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px;
+            width: 200px;
+        }
+        .result {
+            background: rgba(0,255,0,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #00ff00;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: rgba(255,0,0,0.1);
+            border-left: 4px solid #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏍️🚗 Riders Pool - API Test</h1>
+    <p>Direct API testing without frontend complexity</p>
+
+    <!-- OTP Test -->
+    <div class="test-section">
+        <h2>📱 OTP Test</h2>
+        <input type="tel" id="testMobile" placeholder="+91XXXXXXXXXX" value="+919876543210">
+        <button onclick="testSendOTP()">Send OTP</button>
+        <br>
+        <input type="text" id="testOTP" placeholder="Enter OTP" maxlength="6">
+        <input type="text" id="testName" placeholder="Your Name" value="Test User">
+        <button onclick="testVerifyOTP()">Verify OTP</button>
+        <div id="otpResult" class="result" style="display: none;"></div>
+    </div>
+
+    <!-- Email Test -->
+    <div class="test-section">
+        <h2>📧 Email Verification Test</h2>
+        <input type="email" id="testEmail" placeholder="test@example.com" value="test@riders.com">
+        <input type="text" id="testNameEmail" placeholder="Your Name" value="Test User Email">
+        <button onclick="testSendEmail()">Send Verification Email</button>
+        <div id="emailResult" class="result" style="display: none;"></div>
+    </div>
+
+    <!-- Login Test -->
+    <div class="test-section">
+        <h2>🔐 Login Test</h2>
+        <input type="text" id="loginMobile" placeholder="Mobile/Email" value="+919876543210">
+        <input type="password" id="loginPassword" placeholder="Password" value="123456">
+        <button onclick="testLogin()">Login with Password</button>
+        <div id="loginResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+
+        // Test Send OTP
+        async function testSendOTP() {
+            const mobile = document.getElementById('testMobile').value;
+            const result = document.getElementById('otpResult');
+            
+            try {
+                result.style.display = 'block';
+                result.className = 'result';
+                result.textContent = 'Sending OTP...';
+                
+                const response = await fetch(`${API_BASE}/auth/send-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ mobile })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.textContent = `✅ SUCCESS!\n${data.message}\nMobile: ${data.data.mobile}\nExpires in: ${data.data.expiresIn}s\n\n📋 Check console for OTP code!`;
+                    console.log('🔑 OTP Code should appear in server console');
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR: ${data.message}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ NETWORK ERROR: ${error.message}`;
+            }
+        }
+
+        // Test Verify OTP
+        async function testVerifyOTP() {
+            const mobile = document.getElementById('testMobile').value;
+            const otp = document.getElementById('testOTP').value;
+            const name = document.getElementById('testName').value;
+            const result = document.getElementById('otpResult');
+            
+            try {
+                result.style.display = 'block';
+                result.className = 'result';
+                result.textContent = 'Verifying OTP...';
+                
+                const response = await fetch(`${API_BASE}/auth/verify-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ mobile, otp, name, role: 'user' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.textContent = `✅ SUCCESS!\n${data.message}\nUser: ${data.data.user.name}\nToken: ${data.data.token.substring(0, 20)}...\nNew User: ${data.data.isNewUser}`;
+                    localStorage.setItem('riders_token', data.data.token);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR: ${data.message}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ NETWORK ERROR: ${error.message}`;
+            }
+        }
+
+        // Test Send Email
+        async function testSendEmail() {
+            const email = document.getElementById('testEmail').value;
+            const name = document.getElementById('testNameEmail').value;
+            const result = document.getElementById('emailResult');
+            
+            try {
+                result.style.display = 'block';
+                result.className = 'result';
+                result.textContent = 'Sending verification email...';
+                
+                const response = await fetch(`${API_BASE}/auth/send-verification-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, name, role: 'user' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.textContent = `✅ SUCCESS!\n${data.message}\nEmail: ${data.data.email}\n\n📋 Check console for verification link!`;
+                    if (data.data.verificationLink) {
+                        console.log('🔗 Verification Link:', data.data.verificationLink);
+                    }
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR: ${data.message}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ NETWORK ERROR: ${error.message}`;
+            }
+        }
+
+        // Test Login
+        async function testLogin() {
+            const email = document.getElementById('loginMobile').value;
+            const password = document.getElementById('loginPassword').value;
+            const result = document.getElementById('loginResult');
+            
+            try {
+                result.style.display = 'block';
+                result.className = 'result';
+                result.textContent = 'Logging in...';
+                
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.textContent = `✅ SUCCESS!\n${data.message}\nUser: ${data.data.user.name}\nToken: ${data.data.token.substring(0, 20)}...`;
+                    localStorage.setItem('riders_token', data.data.token);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR: ${data.message}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ NETWORK ERROR: ${error.message}`;
+            }
+        }
+
+        // Show current API status
+        console.log('🎯 API Test Page Ready!');
+        console.log('📍 API Base URL:', API_BASE);
+        console.log('🔗 Main App: ' + window.location.origin);
+    </script>
+</body>
+</html>

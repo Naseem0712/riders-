@@ -101,6 +101,17 @@ const rideSchema = new mongoose.Schema({
       default: 'moderate'
     }
   },
+  
+  // Bike-specific requirements
+  bikeRequirements: {
+    helmetProvided: { type: Boolean, default: false },
+    helmetRequired: { type: Boolean, default: true },
+    helmetCondition: {
+      type: String,
+      enum: ['new', 'good', 'average'],
+      default: 'good'
+    }
+  },
   recurring: {
     isRecurring: { type: Boolean, default: false },
     frequency: {

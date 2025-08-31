@@ -495,7 +495,7 @@ const PWA = {
     try {
       if (!App.state.isAuthenticated) return;
       
-      await Auth.apiRequest('/api/notifications/subscribe', {
+      await Auth.apiRequest('/notifications/subscribe', {
         method: 'POST',
         body: JSON.stringify(subscription)
       });
