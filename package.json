@@ -20,6 +20,10 @@
   "author": "Riders Team",
   "license": "MIT",
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@sendgrid/mail": "^7.7.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -29,12 +33,12 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb-memory-server": "^10.2.0",
     "mongoose": "^7.5.0",
-    "validator": "^13.11.0",
+    "nodemailer": "^6.9.0",
     "twilio": "^4.19.0",
-    "@sendgrid/mail": "^7.7.0",
-    "nodemailer": "^6.9.0"
+    "validator": "^13.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "typescript": "^5.9.2"
   }
 }
