@@ -280,10 +280,11 @@ const Chat = {
     }
   },
 
-  // Make call (placeholder)
+  // Make call
   makeCall(recipientId) {
-    App.showToast('📞 Calling feature coming soon!', 'info');
-    // This will integrate with WebRTC or calling service
+    // Open call modal
+    Profile.makeVoiceCall();
+    App.showToast('📞 Connecting call...', 'info');
   },
 
   // Load user chats

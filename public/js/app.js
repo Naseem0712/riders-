@@ -537,8 +537,8 @@ const App = {
       return;
     }
     
-    // Implementation for booking rides
-    this.showToast('Booking functionality coming soon!', 'info');
+    // Show booking confirmation modal
+    this.showBookingModal(rideId);
   },
   
   // View ride details
@@ -546,6 +546,197 @@ const App = {
     // Implementation for viewing ride details
     this.showToast('Ride details functionality coming soon!', 'info');
   },
+
+  // Show booking modal
+  showBookingModal(rideId) {
+    // Create booking modal if not exists
+    let modal = document.getElementById('bookingModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bookingModal';
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-content glass-card">
+          <div class="modal-header">
+            <h3>Book This Ride</h3>
+            <button class="modal-close" onclick="hideBookingModal()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="bookingForm">
+              <div class="form-group">
+                <label>Number of Seats</label>
+                <select id="bookingSeats" required>
+                  <option value="1">1 Seat</option>
+                  <option value="2">2 Seats</option>
+                  <option value="3">3 Seats</option>
+                  <option value="4">4 Seats</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Pickup Point</label>
+                <input type="text" id="bookingPickup" placeholder="Enter pickup location" required>
+              </div>
+              <div class="form-group">
+                <label>Drop Point</label>
+                <input type="text" id="bookingDrop" placeholder="Enter drop location" required>
+              </div>
+              <div class="form-group">
+                <label>Special Instructions</label>
+                <textarea id="bookingNotes" placeholder="Any special requests..." rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="hideBookingModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm Booking</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      // Add form submission handler
+      const form = modal.querySelector('#bookingForm');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await this.confirmBooking(rideId);
+      });
+    }
+
+    modal.style.display = 'flex';
+  },
+
+  // Confirm booking
+  async confirmBooking(rideId) {
+    const bookingData = {
+      seats: document.getElementById('bookingSeats').value,
+      pickup: document.getElementById('bookingPickup').value,
+      drop: document.getElementById('bookingDrop').value,
+      notes: document.getElementById('bookingNotes').value
+    };
+
+    try {
+      this.setLoading(true);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      this.showToast('Ride booked successfully! 🎉', 'success');
+      this.hideBookingModal();
+      
+      // Start 12-hour contact window
+      Profile.startContactWindow(rideId, 'driver_123', 'John Driver');
+      
+    } catch (error) {
+      console.error('Booking error:', error);
+      this.showToast('Booking failed. Please try again.', 'error');
+    } finally {
+      this.setLoading(false);
+    }
+  },
+
+  // Hide booking modal
+  hideBookingModal() {
+    const modal = document.getElementById('bookingModal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  },
+
+  // Handle ride request (when no rides found)
+  async handleRideRequest(formData) {
+    if (!this.state.isAuthenticated) {
+      this.showAuthModal('login');
+      return;
+    }
+
+    const requestData = {
+      pickup: formData.get('pickup') || 'Current Location',
+      destination: formData.get('destination') || 'Destination',
+      vehicleType: formData.get('vehicleType'),
+      seatsNeeded: parseInt(formData.get('seats')),
+      budgetPerSeat: parseInt(formData.get('budget')) || 50,
+      preferredDate: formData.get('date') || new Date().toISOString().split('T')[0],
+      preferredTime: formData.get('time') || '09:00',
+      contactNumber: Auth.getCurrentUser()?.mobile || '+91 XXXXX XXXXX',
+      notes: formData.get('notes') || `Need ${formData.get('vehicleType')} ride`
+    };
+
+    try {
+      this.setLoading(true);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Store ride request
+      const requestId = 'req_' + Date.now();
+      const storedRequests = JSON.parse(localStorage.getItem('rideRequests') || '[]');
+      storedRequests.push({
+        id: requestId,
+        ...requestData,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        userId: Auth.getCurrentUser()?.id || 'demo_user'
+      });
+      localStorage.setItem('rideRequests', JSON.stringify(storedRequests));
+      
+      this.showToast('🎉 Ride request posted! Drivers will be notified.', 'success');
+      
+      // Hide request section
+      document.getElementById('rideRequestSection').style.display = 'none';
+      
+      // Show confirmation
+      setTimeout(() => {
+        this.showToast('📱 Your request is visible to drivers nearby', 'info');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Ride request error:', error);
+      this.showToast('Failed to post request. Please try again.', 'error');
+    } finally {
+      this.setLoading(false);
+    }
+  },
+
+  // Get current location
+  getCurrentLocation(inputId) {
+    if (navigator.geolocation) {
+      this.showToast('🌍 Getting your location...', 'info');
+      
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          try {
+            // Use reverse geocoding to get address
+            const address = await this.reverseGeocode(latitude, longitude);
+            const input = document.getElementById(inputId);
+            if (input) {
+              input.value = address;
+              input.dataset.coordinates = `${latitude},${longitude}`;
+            }
+            this.showToast('📍 Location found!', 'success');
+          } catch (error) {
+            console.error('Geocoding error:', error);
+            this.showToast('📍 Location found, but address lookup failed', 'warning');
+          }
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          this.showToast('Could not get your location. Please enter manually.', 'error');
+        }
+      );
+    } else {
+      this.showToast('Geolocation is not supported by this browser', 'error');
+    }
+  },
+
+  // Reverse geocoding (simplified)
+  async reverseGeocode(lat, lng) {
+    // For demo purposes, return a sample address
+    return `Near ${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+  }
   
   // Switch bookings tab
   switchBookingsTab(tab) {
