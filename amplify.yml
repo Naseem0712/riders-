@@ -3,32 +3,21 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "Installing dependencies..."
         - npm install
-        - echo "Environment check..."
-        - echo "MONGODB_URI=$MONGODB_URI"
-        - echo "NODE_ENV=$NODE_ENV"
     build:
       commands:
         - echo "Building Riders Luxury App..."
-        - echo "Starting Node.js server for AWS Amplify..."
-        - npm run start &
-        - sleep 3
-        - echo "Server started successfully"
+        - npm start &
+        - sleep 10
+        - pkill -f "node server/server.js" || true
     postBuild:
       commands:
         - echo "Build completed successfully!"
-        - echo "Frontend served from public directory"
   artifacts:
-    baseDirectory: public
+    baseDirectory: ./
     files:
       - '**/*'
+    name: riders-luxury-app
   cache:
     paths:
       - node_modules/**/*
-backend:
-  phases:
-    build:
-      commands:
-        - echo "Backend will run as serverless function"
-        - npm install --production
