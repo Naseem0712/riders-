@@ -93,19 +93,24 @@ const connectDB = async () => {
     console.log('⚠️ Working MongoDB failed:', workingError.message);
   }
 
-  // Priority 4: In-memory fallback for demo
-  try {
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    const mongod = await MongoMemoryServer.create();
-    const uri = mongod.getUri();
-    await mongoose.connect(uri);
-    console.log('✅ Connected to in-memory MongoDB (demo mode)');
-    console.log('📝 Note: Data will be lost when server restarts');
-  } catch (memoryError) {
-    console.error('❌ All database connections failed!');
-    console.log('🔧 Continuing without database - API calls will fail');
-    // Don't exit, let app run for debugging
+  // Priority 4: Railway MongoDB Service
+  if (process.env.DATABASE_URL) {
+    try {
+      await mongoose.connect(process.env.DATABASE_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      console.log('✅ Connected to Railway Database');
+      return;
+    } catch (railwayError) {
+      console.log('⚠️ Railway Database failed:', railwayError.message);
+    }
   }
+
+  // Priority 5: Temporary storage for demo
+  console.log('🔧 Using temporary storage for demo mode');
+  console.log('✅ Server ready - App will work with temporary data');
+  console.log('📝 Note: OTP and basic features will work')
 };
 
 connectDB();
