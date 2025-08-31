@@ -1,0 +1,24 @@
+# Environment Variables Template
+# Copy these to your .env file and replace with your actual credentials
+
+# MongoDB Atlas
+MONGODB_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/your-database
+
+# JWT Secret (generate a secure random string)
+JWT_SECRET=your-super-secure-jwt-secret-key
+
+# Server Configuration
+PORT=8080
+NODE_ENV=production
+
+# Frontend URL
+FRONTEND_URL=https://your-domain.amplifyapp.com
+
+# SMS Service (Twilio) - Optional
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=your_twilio_phone_number
+
+# Email Service (SendGrid) - Optional
+SENDGRID_API_KEY=your_sendgrid_api_key
+FROM_EMAIL=noreply@yourdomain.com
