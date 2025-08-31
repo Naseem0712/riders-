@@ -371,24 +371,67 @@ const App = {
   
   // Search for rides
   async searchRides(searchData) {
-    const params = new URLSearchParams();
-    
-    Object.keys(searchData).forEach(key => {
-      if (searchData[key]) {
-        params.append(key, searchData[key]);
+    try {
+      // Simulate API call with demo data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate demo rides based on search
+      const demoRides = this.generateDemoRides(searchData);
+      
+      this.state.rides = demoRides;
+      this.displaySearchResults(demoRides, { currentPage: 1, totalPages: 1, total: demoRides.length });
+      
+      if (demoRides.length === 0) {
+        this.showRideRequestOption(searchData);
+        this.showToast('No rides found. You can post a ride request!', 'info');
+      } else {
+        this.showToast(`Found ${demoRides.length} rides`, 'success');
       }
-    });
-    
-    const response = await fetch(`${this.apiUrl}/rides/search?${params}`);
-    const data = await response.json();
-    
-    if (data.success) {
-      this.state.rides = data.data.rides;
-      this.displaySearchResults(data.data.rides, data.data.pagination);
-      this.showToast(`Found ${data.data.rides.length} rides`, 'success');
-    } else {
-      throw new Error(data.message);
+    } catch (error) {
+      console.error('Search error:', error);
+      this.showToast('Search failed. Please try again.', 'error');
     }
+  },
+
+  // Generate demo rides for search results
+  generateDemoRides(searchData) {
+    const demoRides = [
+      {
+        _id: 'ride_1',
+        driverName: 'John Driver',
+        vehicleInfo: 'Honda City - White',
+        from: searchData.pickup || 'Delhi',
+        to: searchData.destination || 'Mumbai', 
+        date: searchData.date || new Date().toISOString().split('T')[0],
+        time: '09:00 AM',
+        availableSeats: 3,
+        pricePerSeat: 150,
+        totalPrice: 450,
+        driverRating: 4.8,
+        verified: true
+      },
+      {
+        _id: 'ride_2', 
+        driverName: 'Sarah Khan',
+        vehicleInfo: 'Toyota Innova - Silver',
+        from: searchData.pickup || 'Delhi',
+        to: searchData.destination || 'Mumbai',
+        date: searchData.date || new Date().toISOString().split('T')[0],
+        time: '02:00 PM',
+        availableSeats: 5,
+        pricePerSeat: 180,
+        totalPrice: 900,
+        driverRating: 4.9,
+        verified: true
+      }
+    ];
+    
+    // Filter based on search criteria
+    return demoRides.filter(ride => {
+      if (searchData.maxPrice && ride.pricePerSeat > parseInt(searchData.maxPrice)) return false;
+      if (searchData.seats && ride.availableSeats < parseInt(searchData.seats)) return false;
+      return true;
+    });
   },
   
   // Display search results
@@ -509,25 +552,20 @@ const App = {
     }
   },
   
-  // Handle offer ride
+    // Handle offer ride
   async handleOfferRide(e) {
     e.preventDefault();
-    
+
     if (!this.state.isAuthenticated) {
       this.showAuthModal('login');
       return;
     }
-    
-    // Check if user has vehicles
-    await Vehicle.loadUserVehicles();
-    if (Vehicle.userVehicles.length === 0) {
-      this.showToast('Please add a vehicle first to offer rides', 'warning');
-      this.showSection('profile');
-      return;
-    }
-    
-    // Show ride offer form
+
+    // Show ride offer form first
     this.showSection('offer-ride');
+    
+    // Load user vehicles for selection
+    await this.loadUserVehicles();
   },
   
   // Book a ride
@@ -771,29 +809,52 @@ const App = {
     }
   },
   
-  // Load user vehicles
+  // Load user vehicles for ride offering
   async loadUserVehicles() {
     if (!this.state.isAuthenticated) return;
     
-    // Implementation for loading user vehicles
+    // Load vehicles from Vehicle module
+    await Vehicle.loadUserVehicles();
+    
     const vehicleSelector = document.getElementById('vehicleSelector');
     if (vehicleSelector) {
-      // Show add vehicle prompt if no vehicles
-      vehicleSelector.innerHTML = `
-        <div class="add-vehicle-prompt">
-          <i class="fas fa-plus-circle"></i>
-          <p>Add your first vehicle to start offering rides</p>
-          <button type="button" class="btn btn-secondary" onclick="App.showAddVehicleModal()">
-            Add Vehicle
-          </button>
-        </div>
-      `;
+      if (Vehicle.userVehicles.length === 0) {
+        // Show add vehicle prompt if no vehicles
+        vehicleSelector.innerHTML = `
+          <div class="add-vehicle-prompt">
+            <i class="fas fa-plus-circle"></i>
+            <p>Add your first vehicle to start offering rides</p>
+            <button type="button" class="btn btn-primary" onclick="Vehicle.showAddModal()">
+              <i class="fas fa-plus"></i> Add Vehicle
+            </button>
+          </div>
+        `;
+      } else {
+        // Show vehicle selection dropdown
+        vehicleSelector.innerHTML = `
+          <div class="vehicle-selection">
+            <label for="selectedVehicle">Select Vehicle for This Ride:</label>
+            <select id="selectedVehicle" class="form-control" required>
+              <option value="">Choose your vehicle</option>
+              ${Vehicle.userVehicles.map(vehicle => `
+                <option value="${vehicle._id}">
+                  ${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}
+                  ${vehicle.isVerified ? '✅' : '⏳'}
+                </option>
+              `).join('')}
+            </select>
+            <button type="button" class="btn btn-secondary btn-small mt-2" onclick="Vehicle.showAddModal()">
+              <i class="fas fa-plus"></i> Add Another Vehicle
+            </button>
+          </div>
+        `;
+      }
     }
   },
   
   // Show add vehicle modal
   showAddVehicleModal() {
-    this.showToast('Add vehicle functionality coming soon!', 'info');
+    Vehicle.showAddModal();
   },
   
   // Load user profile

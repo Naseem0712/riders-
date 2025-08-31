@@ -274,14 +274,41 @@ const Vehicle = {
     if (!Auth.isAuthenticated()) return;
 
     try {
-      const response = await Auth.apiRequest('/vehicles/my-vehicles');
-      const data = await response.json();
-
-      if (data.success) {
-        this.displayVehicles(data.data.vehicles);
+      // Simulate API call with demo data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Check if user has demo vehicles in localStorage
+      const savedVehicles = localStorage.getItem('userVehicles');
+      if (savedVehicles) {
+        this.userVehicles = JSON.parse(savedVehicles);
+      } else {
+        // Add demo vehicle for testing
+        this.userVehicles = [
+          {
+            _id: 'vehicle_demo_1',
+            make: 'Honda',
+            model: 'City',
+            year: 2022,
+            licensePlate: 'DL-01-AB-1234',
+            color: 'White',
+            vehicleType: 'car',
+            category: 'sedan', 
+            seatingCapacity: 4,
+            isVerified: true,
+            documents: {
+              registration: 'verified',
+              insurance: 'verified'
+            }
+          }
+        ];
+        localStorage.setItem('userVehicles', JSON.stringify(this.userVehicles));
       }
+
+      this.displayVehicles(this.userVehicles);
+      
     } catch (error) {
-      console.error('Load vehicles error:', error);
+      console.error('Error loading vehicles:', error);
+      this.userVehicles = [];
     }
   },
 
