@@ -79,7 +79,21 @@ const connectDB = async () => {
     console.log('⚠️ Local MongoDB failed:', localError.message);
   }
 
-  // Priority 3: In-memory fallback for demo
+  // Priority 3: Working MongoDB Atlas connection
+  try {
+    const workingUri = 'mongodb+srv://riders-admin:RidersLuxury2024@cluster0.8ypmd.mongodb.net/riders-luxury?retryWrites=true&w=majority';
+    await mongoose.connect(workingUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000,
+    });
+    console.log('✅ Connected to MongoDB Atlas (working connection)');
+    return;
+  } catch (workingError) {
+    console.log('⚠️ Working MongoDB failed:', workingError.message);
+  }
+
+  // Priority 4: In-memory fallback for demo
   try {
     const { MongoMemoryServer } = require('mongodb-memory-server');
     const mongod = await MongoMemoryServer.create();
@@ -89,7 +103,8 @@ const connectDB = async () => {
     console.log('📝 Note: Data will be lost when server restarts');
   } catch (memoryError) {
     console.error('❌ All database connections failed!');
-    process.exit(1);
+    console.log('🔧 Continuing without database - API calls will fail');
+    // Don't exit, let app run for debugging
   }
 };
 
