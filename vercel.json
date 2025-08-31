@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "riders-luxury",
+  "builds": [
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "mongodb+srv://riders-admin:RidersLuxury2024@cluster0.mongodb.net/riders-luxury-prod?retryWrites=true&w=majority",
+    "JWT_SECRET": "riders-luxury-production-secret-key-2024-vercel",
+    "NODE_ENV": "production"
+  }
+}

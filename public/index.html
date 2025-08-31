@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Riders Luxury - Premium ride sharing experience with elegant glassmorphism design">
+    <meta name="keywords" content="ride sharing, luxury rides, car pooling, travel, transportation">
+    <meta name="author" content="Riders Luxury">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Riders Luxury">
+    <meta name="msapplication-TileColor" content="#000000">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#000000">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Preconnect for better performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <title>Riders Luxury - Premium Ride Sharing</title>
+    
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Critical CSS for immediate rendering */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-logo">
+            <i class="fas fa-car-side"></i>
+            <div style="margin-top: 10px;">Riders</div>
+            <div style="font-size: 1rem; font-weight: 400; opacity: 0.8;">Luxury</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar glass-card">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-car-side"></i>
+                <span>Riders</span>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link active" data-section="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#search" class="nav-link" data-section="search">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </a>
+                <a href="#offer" class="nav-link" data-section="offer">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Offer</span>
+                </a>
+                <a href="#bookings" class="nav-link" data-section="bookings">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Bookings</span>
+                </a>
+                <a href="#profile" class="nav-link" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
+            
+            <div class="nav-auth" id="navAuth">
+                <button class="btn btn-ghost" onclick="showAuthModal('login')">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </button>
+            </div>
+            
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="showSection('home')">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </button>
+        <button class="nav-btn" onclick="showSection('search')">
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+        </button>
+        <button class="nav-btn" onclick="showSection('offer')">
+            <i class="fas fa-plus-circle"></i>
+            <span>Offer</span>
+        </button>
+        <button class="nav-btn" onclick="showSection('bookings')">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Bookings</span>
+        </button>
+        <button class="nav-btn" onclick="showSection('profile')">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="main-content">
+        
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Luxury Ride Sharing
+                        <span class="gradient-text">Redefined</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Experience premium transportation with our elegant glass design interface. 
+                        Share rides in luxury vehicles with verified drivers.
+                    </p>
+                    
+                    <div class="hero-actions">
+                        <button class="btn btn-primary ripple-effect" onclick="showSection('search')">
+                            <i class="fas fa-search"></i>
+                            <span>Find Rides</span>
+                        </button>
+                        <button class="btn btn-secondary ripple-effect" onclick="showSection('offer')">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Offer Ride</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="floating-card glass-card">
+                        <div class="card-header">
+                            <div class="driver-info">
+                                <div class="driver-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="driver-details">
+                                    <div class="driver-name">Alex Johnson</div>
+                                    <div class="driver-rating">
+                                        <span class="stars">★★★★★</span>
+                                        <span class="rating-text">4.9</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ride-price">₹250</div>
+                        </div>
+                        
+                        <div class="card-content">
+                            <div class="route-info">
+                                <div class="route-point">
+                                    <i class="fas fa-circle pickup-dot"></i>
+                                    <span>Connaught Place</span>
+                                </div>
+                                <div class="route-line"></div>
+                                <div class="route-point">
+                                    <i class="fas fa-map-marker-alt destination-dot"></i>
+                                    <span>Gurgaon Cyber City</span>
+                                </div>
+                            </div>
+                            
+                            <div class="ride-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>08:30 AM</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>2 seats</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-car"></i>
+                                    <span>BMW X3</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="features">
+                <div class="container">
+                    <h2 class="section-title">Why Choose Riders Luxury?</h2>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card glass-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Safe & Secure</h3>
+                            <p>All drivers are verified with background checks. Real-time location sharing for safety.</p>
+                        </div>
+                        
+                        <div class="feature-card glass-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <h3>Luxury Experience</h3>
+                            <p>Premium vehicles with comfort features. Professional drivers for a superior journey.</p>
+                        </div>
+                        
+                        <div class="feature-card glass-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3>Smart Technology</h3>
+                            <p>Advanced app with glassmorphism design. WhatsApp integration for easy communication.</p>
+                        </div>
+                        
+                        <div class="feature-card glass-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <h3>Eco-Friendly</h3>
+                            <p>Reduce carbon footprint by sharing rides. Support sustainable transportation solutions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search" class="section">
+            <div class="container">
+                <div class="search-header">
+                    <h1 class="page-title">Find Your Perfect Ride</h1>
+                    <p class="page-subtitle">Search from thousands of available rides with luxury vehicles</p>
+                </div>
+                
+                <div class="search-form glass-card">
+                    <form id="searchRideForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="searchPickup">
+                                    <i class="fas fa-circle pickup-dot"></i>
+                                    Pickup Location
+                                </label>
+                                <input type="text" id="searchPickup" placeholder="Where are you leaving from?" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="searchDestination">
+                                    <i class="fas fa-map-marker-alt destination-dot"></i>
+                                    Destination
+                                </label>
+                                <input type="text" id="searchDestination" placeholder="Where are you going?" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="searchDate">
+                                    <i class="fas fa-calendar"></i>
+                                    Date
+                                </label>
+                                <input type="date" id="searchDate" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="searchSeats">
+                                    <i class="fas fa-users"></i>
+                                    Passengers
+                                </label>
+                                <select id="searchSeats">
+                                    <option value="1">1 passenger</option>
+                                    <option value="2">2 passengers</option>
+                                    <option value="3">3 passengers</option>
+                                    <option value="4">4 passengers</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="search-actions">
+                            <button type="submit" class="btn btn-primary ripple-effect">
+                                <i class="fas fa-search"></i>
+                                <span>Search Rides</span>
+                            </button>
+                            
+                            <button type="button" class="btn btn-ghost" onclick="showAdvancedFilters()">
+                                <i class="fas fa-filter"></i>
+                                <span>Filters</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div id="advancedFilters" class="advanced-filters glass-card" style="display: none;">
+                    <h3>Advanced Filters</h3>
+                    
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="maxPrice">Max Price per Seat</label>
+                            <input type="range" id="maxPrice" min="50" max="1000" value="500">
+                            <span class="price-display">₹<span id="priceValue">500</span></span>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="minRating">Minimum Driver Rating</label>
+                            <select id="minRating">
+                                <option value="">Any rating</option>
+                                <option value="3">3+ stars</option>
+                                <option value="4">4+ stars</option>
+                                <option value="4.5">4.5+ stars</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Vehicle Preferences</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="features" value="ac">
+                                    <span class="checkmark"></span>
+                                    Air Conditioning
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="features" value="music">
+                                    <span class="checkmark"></span>
+                                    Music System
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="features" value="wifi">
+                                    <span class="checkmark"></span>
+                                    WiFi
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                        <!-- Search Results -->
+        <div id="searchResults" class="search-results">
+          <!-- Results will be populated by JavaScript -->
+        </div>
+        
+        <!-- Ride Request Section -->
+        <div id="rideRequestSection" class="ride-request-section" style="display: none;">
+          <div class="ride-request-card glass-card">
+            <div class="request-header">
+              <h3>🚗 No Rides Found?</h3>
+              <p>Post your ride request and get notified when drivers register for your route!</p>
+            </div>
+            
+            <form id="rideRequestForm" class="ride-request-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Vehicle Type</label>
+                  <select id="requestVehicleType" required>
+                    <option value="">Select Vehicle</option>
+                    <option value="car">🚗 Car</option>
+                    <option value="bike">🏍️ Bike</option>
+                    <option value="auto">🛺 Auto Rickshaw</option>
+                    <option value="bus">🚌 Bus</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label>Passengers</label>
+                  <select id="requestSeats" required>
+                    <option value="1">1 passenger</option>
+                    <option value="2">2 passengers</option>
+                    <option value="3">3 passengers</option>
+                    <option value="4">4+ passengers</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Preferred Date</label>
+                  <input type="date" id="requestDate" required>
+                </div>
+                
+                <div class="form-group">
+                  <label>Preferred Time</label>
+                  <input type="time" id="requestTime" required>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label>Budget (per person)</label>
+                <input type="range" id="requestBudget" min="50" max="2000" value="300">
+                <div class="budget-display">₹<span id="budgetValue">300</span></div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary ripple-effect">
+                <i class="fas fa-bell"></i>
+                <span>Post Ride Request</span>
+              </button>
+            </form>
+          </div>
+        </div>
+            </div>
+        </section>
+
+        <!-- Offer Ride Section -->
+        <section id="offer" class="section">
+            <div class="container">
+                <div class="offer-header">
+                    <h1 class="page-title">Offer a Ride</h1>
+                    <p class="page-subtitle">Share your journey and earn money while helping others travel in luxury</p>
+                </div>
+                
+                <div class="offer-form glass-card">
+                    <form id="offerRideForm">
+                        <!-- Vehicle Selection -->
+                        <div class="form-section">
+                            <h3 class="section-title">Vehicle Details</h3>
+                            
+                            <div class="vehicle-selector" id="vehicleSelector">
+                                <!-- Vehicle options will be populated by JavaScript -->
+                                <div class="add-vehicle-prompt">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <p>Add your first vehicle to start offering rides</p>
+                                    <button type="button" class="btn btn-secondary" onclick="showAddVehicleModal()">
+                                        Add Vehicle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Route Details -->
+                        <div class="form-section">
+                            <h3 class="section-title">Route Information</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="offerPickup">
+                                        <i class="fas fa-circle pickup-dot"></i>
+                                        Pickup Location
+                                    </label>
+                                    <input type="text" id="offerPickup" placeholder="Starting point of your journey" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="offerDestination">
+                                        <i class="fas fa-map-marker-alt destination-dot"></i>
+                                        Destination
+                                    </label>
+                                    <input type="text" id="offerDestination" placeholder="Where are you going?" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Schedule -->
+                        <div class="form-section">
+                            <h3 class="section-title">Schedule</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="offerDate">
+                                        <i class="fas fa-calendar"></i>
+                                        Date
+                                    </label>
+                                    <input type="date" id="offerDate" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="offerTime">
+                                        <i class="fas fa-clock"></i>
+                                        Time
+                                    </label>
+                                    <input type="time" id="offerTime" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing & Seats -->
+                        <div class="form-section">
+                            <h3 class="section-title">Pricing & Availability</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="availableSeats">
+                                        <i class="fas fa-users"></i>
+                                        Available Seats
+                                    </label>
+                                    <select id="availableSeats" required>
+                                        <option value="1">1 seat</option>
+                                        <option value="2">2 seats</option>
+                                        <option value="3">3 seats</option>
+                                        <option value="4">4 seats</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="pricePerSeat">
+                                        <i class="fas fa-rupee-sign"></i>
+                                        Price per Seat
+                                    </label>
+                                    <input type="number" id="pricePerSeat" placeholder="₹" min="50" max="5000" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Preferences -->
+                        <div class="form-section">
+                            <h3 class="section-title">Preferences</h3>
+                            
+                            <div class="preferences-grid">
+                                <label class="preference-item">
+                                    <input type="checkbox" name="smokingAllowed">
+                                    <span class="checkmark"></span>
+                                    <div class="preference-content">
+                                        <i class="fas fa-smoking"></i>
+                                        <span>Smoking Allowed</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="preference-item">
+                                    <input type="checkbox" name="petsAllowed">
+                                    <span class="checkmark"></span>
+                                    <div class="preference-content">
+                                        <i class="fas fa-paw"></i>
+                                        <span>Pets Allowed</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="preference-item">
+                                    <input type="checkbox" name="musicAllowed" checked>
+                                    <span class="checkmark"></span>
+                                    <div class="preference-content">
+                                        <i class="fas fa-music"></i>
+                                        <span>Music Allowed</span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="conversationLevel">Conversation Level</label>
+                                <select id="conversationLevel">
+                                    <option value="quiet">Quiet journey</option>
+                                    <option value="moderate" selected>Moderate conversation</option>
+                                    <option value="chatty">Love to chat</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Notes -->
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="rideNotes">
+                                    <i class="fas fa-sticky-note"></i>
+                                    Additional Notes (Optional)
+                                </label>
+                                <textarea id="rideNotes" placeholder="Any special instructions or information for passengers..." rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary ripple-effect">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Publish Ride</span>
+                            </button>
+                            
+                            <button type="button" class="btn btn-ghost">
+                                <i class="fas fa-save"></i>
+                                <span>Save as Draft</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bookings Section -->
+        <section id="bookings" class="section">
+            <div class="container">
+                <div class="bookings-header">
+                    <h1 class="page-title">My Bookings</h1>
+                    <p class="page-subtitle">Manage your upcoming and past rides</p>
+                </div>
+                
+                <div class="bookings-tabs">
+                    <button class="tab-btn active" data-tab="upcoming">
+                        <i class="fas fa-clock"></i>
+                        <span>Upcoming</span>
+                    </button>
+                    <button class="tab-btn" data-tab="past">
+                        <i class="fas fa-history"></i>
+                        <span>Past Rides</span>
+                    </button>
+                    <button class="tab-btn" data-tab="offered" id="offeredTab" style="display: none;">
+                        <i class="fas fa-car"></i>
+                        <span>My Offers</span>
+                    </button>
+                </div>
+                
+                <div id="bookingsContent" class="bookings-content">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <div class="container">
+                <div class="profile-header">
+                    <h1 class="page-title">Profile</h1>
+                    <p class="page-subtitle">Manage your account and preferences</p>
+                </div>
+                
+                <div id="profileContent" class="profile-content">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2 id="authModalTitle">Welcome to Riders Luxury</h2>
+                <button class="modal-close" onclick="hideAuthModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">
+                            <i class="fas fa-envelope"></i>
+                            Email or Mobile
+                        </label>
+                        <input type="text" id="loginEmail" placeholder="Enter your email or mobile number" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary ripple-effect">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </button>
+                    
+                    <div class="auth-links">
+                        <a href="#" onclick="showAuthModal('forgot')">Forgot Password?</a>
+                        <a href="#" onclick="showAuthModal('register')">Create Account</a>
+                    </div>
+                </form>
+                
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="registerName">
+                            <i class="fas fa-user"></i>
+                            Full Name
+                        </label>
+                        <input type="text" id="registerName" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerEmail">
+                            <i class="fas fa-envelope"></i>
+                            Email Address
+                        </label>
+                        <input type="email" id="registerEmail" placeholder="Enter your email address" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerMobile">
+                            <i class="fas fa-phone"></i>
+                            Mobile Number
+                        </label>
+                        <input type="tel" id="registerMobile" placeholder="Enter your mobile number" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" id="registerPassword" placeholder="Create a strong password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerRole">
+                            <i class="fas fa-user-tag"></i>
+                            I want to
+                        </label>
+                        <select id="registerRole" required>
+                                                <option value="user">🚗 Find rides as a passenger</option>
+                    <option value="driver">🏎️ Offer rides as a driver</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary ripple-effect">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Create Account</span>
+                    </button>
+                    
+                    <div class="auth-links">
+                        <a href="#" onclick="showAuthModal('login')">Already have an account?</a>
+                    </div>
+                </form>
+                
+                <!-- Forgot Password Form -->
+                <form id="forgotForm" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="forgotEmail">
+                            <i class="fas fa-envelope"></i>
+                            Email or Mobile
+                        </label>
+                        <input type="text" id="forgotEmail" placeholder="Enter your email or mobile number" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary ripple-effect">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Send Reset Link</span>
+                    </button>
+                    
+                    <div class="auth-links">
+                        <a href="#" onclick="showAuthModal('login')">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Install PWA Prompt -->
+    <div id="installPrompt" class="install-prompt glass-card" style="display: none;">
+        <div class="install-content">
+            <div class="install-icon">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="install-text">
+                <h3>Install Riders Luxury</h3>
+                <p>Add to your home screen for quick access</p>
+            </div>
+            <div class="install-actions">
+                <button class="btn btn-primary btn-small" onclick="installPWA()">Install</button>
+                <button class="btn btn-ghost btn-small" onclick="dismissInstall()">Later</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/auth.js"></script>
+    <script src="/js/rides.js"></script>
+    <script src="/js/bookings.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/pwa.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

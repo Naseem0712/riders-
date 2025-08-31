@@ -1,0 +1,35 @@
+# Icons Directory
+
+This directory should contain the following PWA icons:
+
+## Required Icons:
+- favicon-16x16.png (16x16px)
+- favicon-32x32.png (32x32px)
+- apple-touch-icon.png (180x180px)
+- icon-72x72.png (72x72px)
+- icon-96x96.png (96x96px)
+- icon-128x128.png (128x128px)
+- icon-144x144.png (144x144px)
+- icon-152x152.png (152x152px)
+- icon-192x192.png (192x192px)
+- icon-384x384.png (384x384px)
+- icon-512x512.png (512x512px)
+
+## Optional Icons:
+- shortcut-search.png (192x192px)
+- shortcut-offer.png (192x192px)
+- shortcut-bookings.png (192x192px)
+- safari-pinned-tab.svg
+- screenshot-mobile-1.png (375x812px)
+- screenshot-mobile-2.png (375x812px)
+- screenshot-desktop.png (1280x720px)
+
+## Design Guidelines:
+- Use the Riders Luxury branding with deep black background
+- Main icon should feature a luxury car silhouette in white/silver
+- Follow PWA maskable icon guidelines
+- Include padding for maskable icons (safe zone)
+
+## Temporary Workaround:
+Until actual icons are created, the PWA will use FontAwesome icons as fallbacks.
+The manifest.json references these files, so they should be created for production.
