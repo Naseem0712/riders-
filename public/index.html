@@ -803,11 +803,259 @@
                 </div>
                 
                 <div id="profileContent" class="profile-content">
-                    <!-- Content will be populated by JavaScript -->
+                    <!-- Profile Dashboard -->
+                    <div id="profileDashboard" class="profile-dashboard">
+                        <div class="profile-card glass-card">
+                            <div class="profile-header-card">
+                                <div class="profile-avatar" id="profileAvatar">
+                                    <img id="profileImage" src="https://via.placeholder.com/120?text=👤" alt="Profile">
+                                    <div class="avatar-upload">
+                                        <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+                                        <button class="upload-btn" onclick="document.getElementById('profileImageInput').click()">
+                                            <i class="fas fa-camera"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="profile-info">
+                                    <h3 id="profileName">User Name</h3>
+                                    <p id="profileMobile">+91 XXXXX XXXXX</p>
+                                    <div class="profile-badges">
+                                        <span class="badge verified" id="phoneVerified">
+                                            <i class="fas fa-check-circle"></i> Phone Verified
+                                        </span>
+                                        <span class="badge rating" id="userRating">
+                                            <i class="fas fa-star"></i> 4.8
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="profile-actions">
+                                    <button class="btn btn-primary" onclick="showEditProfile()">
+                                        <i class="fas fa-edit"></i> Edit Profile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="stats-grid">
+                            <div class="stat-card glass-card">
+                                <div class="stat-icon">🚗</div>
+                                <div class="stat-info">
+                                    <h4 id="totalRides">0</h4>
+                                    <p>Total Rides</p>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-card">
+                                <div class="stat-icon">⭐</div>
+                                <div class="stat-info">
+                                    <h4 id="avgRating">0.0</h4>
+                                    <p>Rating</p>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-card">
+                                <div class="stat-icon">💰</div>
+                                <div class="stat-info">
+                                    <h4 id="totalEarnings">₹0</h4>
+                                    <p>Earnings</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Menu -->
+                        <div class="profile-menu">
+                            <div class="menu-item glass-card" onclick="showPersonalInfo()">
+                                <i class="fas fa-user"></i>
+                                <span>Personal Information</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="menu-item glass-card" onclick="showVehicleManagement()">
+                                <i class="fas fa-car"></i>
+                                <span>My Vehicles</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="menu-item glass-card" onclick="showRideHistory()">
+                                <i class="fas fa-history"></i>
+                                <span>Ride History</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="menu-item glass-card" onclick="showPaymentMethods()">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Payment Methods</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="menu-item glass-card" onclick="showNotificationSettings()">
+                                <i class="fas fa-bell"></i>
+                                <span>Notifications</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="menu-item glass-card" onclick="showPrivacySettings()">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Privacy & Security</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="menu-item glass-card" onclick="showHelpSupport()">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Help & Support</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="menu-item glass-card danger" onclick="Auth.logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Profile Form -->
+                    <div id="editProfileForm" class="edit-profile-form" style="display: none;">
+                        <div class="form-header">
+                            <button class="back-btn" onclick="hideEditProfile()">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h3>Edit Profile</h3>
+                            <button class="save-btn" onclick="saveProfile()">Save</button>
+                        </div>
+                        
+                        <form class="glass-card">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="editName" placeholder="Enter your full name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" id="editEmail" placeholder="Enter your email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" id="editDOB">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select id="editGender">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Emergency Contact</label>
+                                <input type="tel" id="editEmergencyContact" placeholder="+91 XXXXX XXXXX">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea id="editAddress" placeholder="Enter your address" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Bio</label>
+                                <textarea id="editBio" placeholder="Tell others about yourself" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal chat-modal">
+        <div class="modal-content glass-card">
+            <div class="chat-header">
+                <div class="chat-user-info">
+                    <img id="chatUserAvatar" src="https://via.placeholder.com/40?text=👤" alt="User">
+                    <div class="chat-user-details">
+                        <h4 id="chatUserName">User Name</h4>
+                        <p id="chatUserStatus">Online • Available for contact</p>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="call-btn" onclick="makeVoiceCall()" title="Voice Call">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="video-call-btn" onclick="makeVideoCall()" title="Video Call">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="modal-close" onclick="hideChatModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-window-timer">
+                <div class="timer-info">
+                    <i class="fas fa-clock"></i>
+                    <span id="chatTimer">12:00:00 remaining</span>
+                    <div class="timer-reason">Contact window for ride assistance</div>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message system">
+                    <div class="message-content">
+                        <p>🚗 Ride completed! You have 12 hours to contact each other for any assistance or lost items.</p>
+                        <span class="message-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-section">
+                <div class="quick-messages">
+                    <button class="quick-msg-btn" onclick="sendQuickMessage('👋 Hello!')">👋 Hello</button>
+                    <button class="quick-msg-btn" onclick="sendQuickMessage('📱 Left my phone')">📱 Phone</button>
+                    <button class="quick-msg-btn" onclick="sendQuickMessage('💼 Left my bag')">💼 Bag</button>
+                    <button class="quick-msg-btn" onclick="sendQuickMessage('🔑 Left my keys')">🔑 Keys</button>
+                    <button class="quick-msg-btn" onclick="sendQuickMessage('👍 Thank you!')">👍 Thanks</button>
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="Type your message..." maxlength="500">
+                    <button class="attachment-btn" onclick="selectAttachment()" title="Attach File">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="send-btn" onclick="sendMessage()" title="Send Message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <input type="file" id="attachmentInput" accept="image/*,audio/*" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Modal -->
+    <div id="callModal" class="modal call-modal">
+        <div class="modal-content glass-card">
+            <div class="call-interface">
+                <div class="caller-info">
+                    <img id="callerAvatar" src="https://via.placeholder.com/120?text=👤" alt="Caller">
+                    <h3 id="callerName">John Doe</h3>
+                    <p id="callStatus">Connecting...</p>
+                </div>
+                
+                <div class="call-timer" id="callTimer" style="display: none;">
+                    <span id="callDuration">00:00</span>
+                </div>
+                
+                <div class="call-controls">
+                    <button class="call-control-btn mute-btn" onclick="toggleMute()" title="Mute">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="call-control-btn speaker-btn" onclick="toggleSpeaker()" title="Speaker">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button class="call-control-btn end-call-btn" onclick="endCall()" title="End Call">
+                        <i class="fas fa-phone-slash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Auth Modal -->
     <div id="authModal" class="modal">

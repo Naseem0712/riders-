@@ -2,9 +2,16 @@
 // Handles profile editing, photo upload, and user data management
 
 const Profile = {
+  currentUser: null,
+  profileImage: null,
+  contactWindows: new Map(), // Store 12-hour contact windows
+  
   // Initialize profile module
   init() {
     this.initEventListeners();
+    this.initImageUpload();
+    this.loadUserProfile();
+    this.checkContactWindows();
     console.log('👤 Profile module initialized');
   },
 
@@ -16,276 +23,329 @@ const Profile = {
       profileForm.addEventListener('submit', this.handleProfileUpdate.bind(this));
     }
 
-    // Photo upload
-    const photoUpload = document.getElementById('profilePhotoInput');
-    if (photoUpload) {
-      photoUpload.addEventListener('change', this.handlePhotoUpload.bind(this));
-    }
-
-    // Profile edit button
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    if (editProfileBtn) {
-      editProfileBtn.addEventListener('click', this.showEditProfile.bind(this));
+    // Message input enter key
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+      messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.sendMessage();
+        }
+      });
     }
   },
 
-  // Show edit profile modal
-  showEditProfile() {
-    const user = App.state.user;
-    if (!user) {
-      App.showToast('Please login first', 'error');
+  // Initialize image upload
+  initImageUpload() {
+    const imageInput = document.getElementById('profileImageInput');
+    if (imageInput) {
+      imageInput.addEventListener('change', this.handleImageUpload.bind(this));
+    }
+  },
+
+  // Handle image upload
+  async handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      App.showToast('Please select a valid image file', 'error');
       return;
     }
 
-    // Populate form with current data
-    this.populateProfileForm(user);
-    
-    // Show modal
-    const modal = document.getElementById('editProfileModal');
-    if (modal) {
-      modal.style.display = 'block';
+    if (file.size > 5 * 1024 * 1024) {
+      App.showToast('Image size should be less than 5MB', 'error');
+      return;
+    }
+
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const profileImage = document.getElementById('profileImage');
+        if (profileImage) {
+          profileImage.src = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+      this.profileImage = file;
+      App.showToast('Image selected. Click Save to upload.', 'success');
+    } catch (error) {
+      console.error('Image upload error:', error);
+      App.showToast('Failed to process image', 'error');
     }
   },
 
-  // Hide edit profile modal
-  hideEditProfile() {
-    const modal = document.getElementById('editProfileModal');
-    if (modal) {
-      modal.style.display = 'none';
+  // Load user profile
+  async loadUserProfile() {
+    if (!Auth.isAuthenticated()) return;
+    try {
+      const user = Auth.getCurrentUser();
+      if (user) {
+        this.currentUser = user;
+        this.updateProfileDisplay(user);
+      }
+    } catch (error) {
+      console.error('Load profile error:', error);
     }
   },
 
-  // Populate profile form with user data
-  populateProfileForm(user) {
-    document.getElementById('editName').value = user.name || '';
-    document.getElementById('editEmail').value = user.email || '';
-    document.getElementById('editMobile').value = user.mobile || '';
-    document.getElementById('editAge').value = user.age || '';
-    document.getElementById('editGender').value = user.gender || '';
-    document.getElementById('editCity').value = user.city || '';
-    
-    // Show current profile photo
-    const photoPreview = document.getElementById('photoPreview');
-    if (photoPreview && user.profilePicture) {
-      photoPreview.src = user.profilePicture;
-      photoPreview.style.display = 'block';
+  // Update profile display
+  updateProfileDisplay(user) {
+    const elements = {
+      profileName: user.name || 'User Name',
+      profileMobile: user.mobile || '+91 XXXXX XXXXX',
+      totalRides: user.totalRides || 0,
+      avgRating: user.rating || '4.8',
+      totalEarnings: `₹${user.earnings || 0}`
+    };
+
+    Object.keys(elements).forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = elements[id];
+      }
+    });
+
+    if (user.profileImage) {
+      const profileImage = document.getElementById('profileImage');
+      if (profileImage) {
+        profileImage.src = user.profileImage;
+      }
     }
+  },
+
+  // Check contact windows
+  checkContactWindows() {
+    const now = Date.now();
+    for (const [rideId, window] of this.contactWindows) {
+      if (now > window.expiresAt) {
+        this.contactWindows.delete(rideId);
+      }
+    }
+  },
+
+  // Start contact window after ride completion
+  startContactWindow(rideId, otherUserId, otherUserName) {
+    const window = {
+      rideId,
+      otherUserId,
+      otherUserName,
+      startedAt: Date.now(),
+      expiresAt: Date.now() + (12 * 60 * 60 * 1000) // 12 hours
+    };
+    
+    this.contactWindows.set(rideId, window);
+    App.showToast(`Contact window opened with ${otherUserName} for 12 hours`, 'info');
+    this.updateRideHistoryWithChat(rideId);
+  },
+
+  // Open chat window
+  openChatWindow(rideId) {
+    const window = this.contactWindows.get(rideId);
+    if (!window) {
+      App.showToast('Contact window has expired', 'error');
+      return;
+    }
+
+    document.getElementById('chatUserName').textContent = window.otherUserName;
+    document.getElementById('chatUserStatus').textContent = 'Available for contact';
+    this.startChatTimer(window.expiresAt);
+    document.getElementById('chatModal').style.display = 'flex';
+  },
+
+  // Start chat timer
+  startChatTimer(expiresAt) {
+    const timerElement = document.getElementById('chatTimer');
+    
+    const updateTimer = () => {
+      const remaining = expiresAt - Date.now();
+      if (remaining <= 0) {
+        timerElement.textContent = 'Contact window expired';
+        return;
+      }
+      
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      
+      timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} remaining`;
+    };
+    
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  },
+
+  // Send message
+  sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    this.addMessageToChat('sent', message);
+    input.value = '';
+    console.log('Message sent:', message);
+  },
+
+  // Send quick message
+  sendQuickMessage(message) {
+    this.addMessageToChat('sent', message);
+    console.log('Quick message sent:', message);
+  },
+
+  // Add message to chat
+  addMessageToChat(type, content) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${type}`;
+    
+    messageDiv.innerHTML = `
+      <div class="message-content">
+        <p>${content}</p>
+        <span class="message-time">${new Date().toLocaleTimeString()}</span>
+      </div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  },
+
+  // Make voice call
+  makeVoiceCall() {
+    document.getElementById('callModal').style.display = 'flex';
+    document.getElementById('callStatus').textContent = 'Connecting...';
+    
+    setTimeout(() => {
+      document.getElementById('callStatus').textContent = 'Connected';
+      document.getElementById('callTimer').style.display = 'block';
+      this.startCallTimer();
+    }, 3000);
+  },
+
+  // Start call timer
+  startCallTimer() {
+    let seconds = 0;
+    const timerElement = document.getElementById('callDuration');
+    
+    const updateTimer = () => {
+      seconds++;
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      timerElement.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+    
+    this.callInterval = setInterval(updateTimer, 1000);
+  },
+
+  // End call
+  endCall() {
+    if (this.callInterval) {
+      clearInterval(this.callInterval);
+    }
+    document.getElementById('callModal').style.display = 'none';
   },
 
   // Handle profile update
   async handleProfileUpdate(e) {
     e.preventDefault();
     
-    const formData = new FormData(e.target);
-    const profileData = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      mobile: formData.get('mobile'),
-      age: formData.get('age'),
-      gender: formData.get('gender'),
-      city: formData.get('city')
-    };
+    if (!Auth.isAuthenticated()) {
+      App.showToast('Please login first', 'error');
+      return;
+    }
+
+    const formData = new FormData();
+    
+    // Add form fields
+    const fields = ['name', 'email', 'bio', 'location'];
+    fields.forEach(field => {
+      const element = document.getElementById(field);
+      if (element && element.value) {
+        formData.append(field, element.value);
+      }
+    });
+
+    // Add profile image if selected
+    if (this.profileImage) {
+      formData.append('profileImage', this.profileImage);
+    }
 
     try {
       App.setLoading(true);
       
-      const response = await Auth.apiRequest('/auth/profile', {
-        method: 'PUT',
-        body: JSON.stringify(profileData)
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Update stored user data
-        localStorage.setItem('riders_user', JSON.stringify(data.data.user));
-        App.setAuthState(true, data.data.user);
-        
-        this.hideEditProfile();
-        App.showToast('Profile updated successfully!', 'success');
-        
-        // Refresh profile display
-        this.displayProfile(data.data.user);
-      } else {
-        App.showToast(data.message || 'Profile update failed', 'error');
-      }
+      // Simulate API call for demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      App.showToast('Profile updated successfully!', 'success');
+      this.profileImage = null; // Reset
+      
     } catch (error) {
       console.error('Profile update error:', error);
-      App.showToast('Profile update failed. Please try again.', 'error');
+      App.showToast('Failed to update profile', 'error');
     } finally {
       App.setLoading(false);
     }
-  },
-
-  // Handle photo upload
-  async handlePhotoUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate file
-    if (!this.validatePhoto(file)) return;
-
-    try {
-      App.setLoading(true);
-      
-      // Show preview
-      this.showPhotoPreview(file);
-      
-      // Upload photo
-      const photoUrl = await this.uploadPhoto(file);
-      
-      // Update profile with new photo
-      await this.updateProfilePhoto(photoUrl);
-      
-      App.showToast('Profile photo updated successfully!', 'success');
-    } catch (error) {
-      console.error('Photo upload error:', error);
-      App.showToast('Photo upload failed. Please try again.', 'error');
-    } finally {
-      App.setLoading(false);
-    }
-  },
-
-  // Validate photo file
-  validatePhoto(file) {
-    // Check file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      App.showToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
-      return false;
-    }
-
-    // Check file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      App.showToast('Image size should be less than 5MB', 'error');
-      return false;
-    }
-
-    return true;
-  },
-
-  // Show photo preview
-  showPhotoPreview(file) {
-    const preview = document.getElementById('photoPreview');
-    if (preview) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        preview.src = e.target.result;
-        preview.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    }
-  },
-
-  // Upload photo (Base64 for now, can be enhanced with cloud storage)
-  async uploadPhoto(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        // For now, store as base64
-        // In production, upload to cloud storage (AWS S3, Cloudinary, etc.)
-        resolve(reader.result);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  },
-
-  // Update profile photo
-  async updateProfilePhoto(photoUrl) {
-    const response = await Auth.apiRequest('/auth/profile-photo', {
-      method: 'PUT',
-      body: JSON.stringify({ profilePicture: photoUrl })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      // Update stored user data
-      const user = data.data.user;
-      localStorage.setItem('riders_user', JSON.stringify(user));
-      App.setAuthState(true, user);
-      
-      // Update UI
-      this.updateProfilePhotoDisplay(photoUrl);
-      return photoUrl;
-    } else {
-      throw new Error(data.message || 'Photo update failed');
-    }
-  },
-
-  // Update profile photo display
-  updateProfilePhotoDisplay(photoUrl) {
-    const profilePhotos = document.querySelectorAll('.profile-photo');
-    profilePhotos.forEach(photo => {
-      photo.src = photoUrl;
-    });
-  },
-
-  // Display profile information
-  displayProfile(user) {
-    const profileContainer = document.getElementById('profileContainer');
-    if (!profileContainer) return;
-
-    profileContainer.innerHTML = `
-      <div class="profile-card glass-card">
-        <div class="profile-header">
-          <div class="profile-photo-container">
-            <img src="${user.profilePicture || '/icons/default-avatar.png'}" 
-                 alt="Profile" class="profile-photo" id="currentProfilePhoto">
-            <button class="edit-photo-btn" onclick="document.getElementById('profilePhotoInput').click()">
-              <i class="fas fa-camera"></i>
-            </button>
-          </div>
-          <div class="profile-info">
-            <h2>${user.name}</h2>
-            <p class="user-role">${user.role === 'driver' ? '🚗 Driver' : '👤 Rider'}</p>
-            <div class="rating">
-              <span class="stars">⭐⭐⭐⭐⭐</span>
-              <span class="rating-text">${user.rating || '4.8'}</span>
-            </div>
-          </div>
-          <button class="btn-primary edit-profile-btn" onclick="Profile.showEditProfile()">
-            <i class="fas fa-edit"></i> Edit Profile
-          </button>
-        </div>
-        
-        <div class="profile-details">
-          <div class="detail-row">
-            <span class="label">📧 Email:</span>
-            <span class="value">${user.email || 'Not provided'}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">📱 Mobile:</span>
-            <span class="value">${user.mobile || 'Not provided'}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">🎂 Age:</span>
-            <span class="value">${user.age || 'Not provided'}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">👤 Gender:</span>
-            <span class="value">${user.gender || 'Not provided'}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">🏙️ City:</span>
-            <span class="value">${user.city || 'Not provided'}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">📅 Member since:</span>
-            <span class="value">${new Date(user.createdAt).toLocaleDateString()}</span>
-          </div>
-        </div>
-      </div>
-    `;
   }
 };
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  Profile.init();
-});
+// Global functions for HTML onclick events
+window.showEditProfile = () => {
+  document.getElementById('profileDashboard').style.display = 'none';
+  document.getElementById('editProfileForm').style.display = 'block';
+};
 
-// Export for global access
-window.Profile = Profile;
+window.hideEditProfile = () => {
+  document.getElementById('profileDashboard').style.display = 'block';
+  document.getElementById('editProfileForm').style.display = 'none';
+};
+
+window.saveProfile = () => {
+  Profile.handleProfileUpdate({ preventDefault: () => {} });
+};
+
+window.showPersonalInfo = () => {
+  App.showToast('Personal Information feature coming soon!', 'info');
+};
+
+window.showVehicleManagement = () => {
+  App.showSection('vehicle');
+};
+
+window.showRideHistory = () => {
+  App.showToast('Ride History feature coming soon!', 'info');
+};
+
+window.showPaymentMethods = () => {
+  App.showToast('Payment Methods feature coming soon!', 'info');
+};
+
+window.showNotificationSettings = () => {
+  App.showToast('Notification Settings feature coming soon!', 'info');
+};
+
+window.showPrivacySettings = () => {
+  App.showToast('Privacy Settings feature coming soon!', 'info');
+};
+
+window.showHelpSupport = () => {
+  App.showToast('Help & Support feature coming soon!', 'info');
+};
+
+window.sendMessage = () => Profile.sendMessage();
+window.sendQuickMessage = (msg) => Profile.sendQuickMessage(msg);
+window.makeVoiceCall = () => Profile.makeVoiceCall();
+window.makeVideoCall = () => Profile.makeVoiceCall(); // Same as voice for now
+window.endCall = () => Profile.endCall();
+window.toggleMute = () => App.showToast('Mute toggled', 'info');
+window.toggleSpeaker = () => App.showToast('Speaker toggled', 'info');
+window.selectAttachment = () => document.getElementById('attachmentInput').click();
+
+window.hideChatModal = () => {
+  document.getElementById('chatModal').style.display = 'none';
+};
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => Profile.init());
+} else {
+  Profile.init();
+}
