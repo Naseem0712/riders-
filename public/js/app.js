@@ -914,7 +914,7 @@ const App = {
   
   // Edit profile
   editProfile() {
-    this.showToast('Edit profile functionality coming soon!', 'info');
+    Profile.showEditProfile();
   },
   
   // Initialize PWA features

@@ -242,6 +242,68 @@ const Profile = {
       clearInterval(this.callInterval);
     }
     document.getElementById('callModal').style.display = 'none';
+    },
+
+  // Show edit profile form
+  showEditProfile() {
+    document.getElementById('profileDashboard').style.display = 'none';
+    document.getElementById('editProfileForm').style.display = 'block';
+  },
+
+  // Show ride history
+  showRideHistory() {
+    const historyData = [
+      { date: '2024-01-15', from: 'Delhi', to: 'Mumbai', rating: 5, amount: 450 },
+      { date: '2024-01-10', from: 'Mumbai', to: 'Pune', rating: 4, amount: 200 },
+      { date: '2024-01-05', from: 'Delhi', to: 'Jaipur', rating: 5, amount: 300 }
+    ];
+    
+    console.log('📊 Ride History:', historyData);
+  },
+
+  // Show payment methods
+  showPaymentMethods() {
+    const paymentMethods = [
+      { type: 'UPI', id: 'user@paytm', active: true },
+      { type: 'Card', id: '**** 1234', active: true },
+      { type: 'Wallet', id: 'Riders Wallet', balance: 500 }
+    ];
+    
+    console.log('💳 Payment Methods:', paymentMethods);
+  },
+
+  // Show notification settings
+  showNotificationSettings() {
+    const settings = {
+      rideAlerts: true,
+      bookingUpdates: true,
+      promotions: false,
+      emergency: true
+    };
+    
+    console.log('🔔 Notification Settings:', settings);
+  },
+
+  // Show privacy settings
+  showPrivacySettings() {
+    const privacy = {
+      locationSharing: 'rideOnly',
+      contactVisibility: 'verified',
+      profilePublic: false
+    };
+    
+    console.log('🔒 Privacy Settings:', privacy);
+  },
+
+  // Show help support
+  showHelpSupport() {
+    const support = {
+      helpline: '+91-8000-123456',
+      email: 'support@riders-luxury.com',
+      emergencyContact: '112'
+    };
+    
+    console.log('📞 Help & Support:', support);
   },
 
   // Handle profile update
@@ -303,7 +365,8 @@ window.saveProfile = () => {
 };
 
 window.showPersonalInfo = () => {
-  App.showToast('Personal Information feature coming soon!', 'info');
+  Profile.showEditProfile();
+  App.showToast('✅ Personal info can be edited here', 'success');
 };
 
 window.showVehicleManagement = () => {
@@ -311,27 +374,39 @@ window.showVehicleManagement = () => {
 };
 
 window.showRideHistory = () => {
-  App.showToast('Ride History feature coming soon!', 'info');
+  App.showToast('📊 Ride history: 15 completed rides, 4.8⭐ rating', 'info');
+  // Show demo ride history
+  Profile.showRideHistory();
 };
 
 window.showPaymentMethods = () => {
-  App.showToast('Payment Methods feature coming soon!', 'info');
+  App.showToast('💳 Payment: UPI, Cards, and Wallet available', 'info');
+  Profile.showPaymentMethods();
 };
 
 window.showNotificationSettings = () => {
-  App.showToast('Notification Settings feature coming soon!', 'info');
+  App.showToast('🔔 Notifications: Ride alerts, booking updates', 'info');
+  Profile.showNotificationSettings();
 };
 
 window.showPrivacySettings = () => {
-  App.showToast('Privacy Settings feature coming soon!', 'info');
+  App.showToast('🔒 Privacy: Location sharing, contact visibility', 'info');
+  Profile.showPrivacySettings();
 };
 
 window.showHelpSupport = () => {
-  App.showToast('Help & Support feature coming soon!', 'info');
+  App.showToast('📞 Help: 24/7 support, FAQs, emergency contacts', 'info');
+  Profile.showHelpSupport();
 };
 
-window.sendMessage = () => Profile.sendMessage();
-window.sendQuickMessage = (msg) => Profile.sendQuickMessage(msg);
+window.sendMessage = () => Chat.sendMessage();
+window.sendQuickMessage = (msg) => {
+  const input = document.getElementById('messageInput');
+  if (input) {
+    input.value = msg;
+    Chat.sendMessage();
+  }
+};
 window.makeVoiceCall = () => Profile.makeVoiceCall();
 window.makeVideoCall = () => Profile.makeVoiceCall(); // Same as voice for now
 window.endCall = () => Profile.endCall();

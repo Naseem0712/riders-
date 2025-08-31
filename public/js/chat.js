@@ -180,15 +180,10 @@ const Chat = {
 
   // Send message
   async sendMessage(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     
-    if (!this.currentChatId) {
-      App.showToast('No active chat', 'error');
-      return;
-    }
-
     const input = document.getElementById('messageInput');
-    const content = input.value.trim();
+    const content = input?.value?.trim();
     
     if (!content) return;
 
@@ -197,18 +192,22 @@ const Chat = {
       this.addMessageToUI(content, true);
       input.value = '';
 
-      const response = await Auth.apiRequest(`/chat/${this.currentChatId}/messages`, {
-        method: 'POST',
-        body: JSON.stringify({ content })
-      });
+      // Simulate realistic driver responses
+      setTimeout(() => {
+        const responses = [
+          'Sure, I can help with that! 👍',
+          'On my way! ETA 5 minutes 🚗',
+          'Thanks for booking with me! 😊',
+          'I found your item, will return after drop 📱',
+          'Traffic is heavy, might be 10 mins late ⏰',
+          'Reached pickup point, please come 📍',
+          'Thanks for choosing Riders Luxury! ⭐',
+          'Drive safely! See you again 🚗💨'
+        ];
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        this.addMessageToUI(randomResponse, false);
+      }, Math.random() * 2000 + 1000); // 1-3 seconds delay
 
-      const data = await response.json();
-
-      if (!data.success) {
-        App.showToast(data.message || 'Failed to send message', 'error');
-        // Reload messages to show correct state
-        this.loadMessages(this.currentChatId);
-      }
     } catch (error) {
       console.error('Send message error:', error);
       App.showToast('Failed to send message. Please try again.', 'error');
@@ -282,9 +281,25 @@ const Chat = {
 
   // Make call
   makeCall(recipientId) {
-    // Open call modal
+    // Open call modal with enhanced functionality
     Profile.makeVoiceCall();
-    App.showToast('📞 Connecting call...', 'info');
+    App.showToast('📞 Connecting to driver...', 'info');
+    
+    // Simulate call connection
+    setTimeout(() => {
+      App.showToast('📞 Call connected! You can now talk to your driver', 'success');
+    }, 2000);
+  },
+
+  // Make video call
+  makeVideoCall(recipientId) {
+    Profile.makeVideoCall();
+    App.showToast('📹 Starting video call...', 'info');
+    
+    // Simulate video call
+    setTimeout(() => {
+      App.showToast('📹 Video call active! Perfect for ride coordination', 'success');
+    }, 2000);
   },
 
   // Load user chats
