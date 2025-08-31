@@ -45,7 +45,12 @@ app.use(express.static('public'));
 // MongoDB connection with robust fallback
 const connectDB = async () => {
   // Priority 1: MongoDB Atlas (Production)
-  const atlasUri = process.env.MONGODB_URI || 'mongodb+srv://riders-admin:RidersLuxury2024@cluster0.mongodb.net/riders-luxury?retryWrites=true&w=majority&appName=Cluster0';
+  const atlasUri = process.env.MONGODB_URI || 'mongodb+srv://finilexnaseem_db_user:zWy6nTHBcN0XJoOC@cluster0.mongodb.net/riders-luxury?retryWrites=true&w=majority&appName=Cluster0';
+  
+  console.log('🔍 Environment Variables Check:');
+  console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PORT:', process.env.PORT);
   
   try {
     await mongoose.connect(atlasUri, {
